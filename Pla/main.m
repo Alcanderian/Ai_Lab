@@ -13,7 +13,8 @@ save('w.mat', 'W', '-ascii');
 % PLA validate session.
 %
 M_V = load('val.mat', '-ascii');
-W = load('w.mat', 'W', '-ascii');
+W = load('w.mat', '-ascii');
+N = length(M_V(1, :))-1;
 
 Tag_V = M_V(:, N+1);
 M_V = M_V(:, 1:N);
@@ -24,7 +25,8 @@ disp(Eval_V);
 % PLA Test session.
 %
 M_S = load('test.mat', '-ascii');
-W = load('w.mat', 'W', '-ascii');
+W = load('w.mat', '-ascii');
+N = length(M_S(1, :))-1;
 
 M_S = M_S(:, 1:N);
 
