@@ -1,8 +1,14 @@
 function [evals, tag_r] = pla_val(val, tag, w)
-M = length(tag);
-val = [ones(M, 1) val];
+tag_r = pla_test(val, w);
 
-tag_r = sign((w*val')');
+% ==========================================
+% tag actual predict state(actual+2*predict)
+% ------------------------------------------
+% tp   1      1       3
+% fn   1     -1      -1
+% tn  -1     -1      -3
+% fp  -1      1       1
+% ==========================================
 tfpn = tag+2*tag_r;
 
 tp = sum(tfpn == 3);
