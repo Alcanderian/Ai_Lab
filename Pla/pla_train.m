@@ -31,7 +31,7 @@ train = [ones(M, 1) train];
 if ~isfield(param, 'iteration')
     param.iteration = 1;
 end
-if ~isfield(param, 'method')
+if ~isfield(param, 'mode')
     param.mode = 'normal';
 end
 if ~isfield(param, 'init')
@@ -55,32 +55,25 @@ else
     w = zeros(1, N);
 end
 
-% init best w.
-if strcmp(param.mode, 'pocket')
-    b_e = pla_val(train(:, 2:N), tag, w);
-    b_w = w;
-end
-
+% init best w, err.
+[b_e, err] = pla_eval(tag, sign(train*w'));
 for k = 1:param.iteration
     for i = 1:M
-        % predict one.
-        if tag(i) ~= sign(w*train(i, :)')
-            % renew w.
+        if err(i)
+            % renew current w.
             w = w+tag(i)*train(i, :);
-            
+            % eval current w.
+            [e, err] = pla_eval(tag, sign(train*w'));
             if strcmp(param.mode, 'pocket')
-                % eval current w.
-                [evals, ~] = pla_val(train(:, 2:N), tag, w);
-                
                 if strcmp(param.eval, 'f1')
-                    better = evals.f1 > b_e.f1;
+                    better = e.f1 > b_e.f1;
                 else
-                    better = evals.accuracy > b_e.accuracy;
+                    better = e.accuracy > b_e.accuracy;
                 end
                 
-                % renew bset w.
+                % renew best w.
                 if better
-                    b_e = evals;
+                    b_e = e;
                     b_w = w;
                     
                     if param.progress
@@ -93,10 +86,7 @@ for k = 1:param.iteration
         end
     end
     
-    if ~strcmp(param.mode, 'pocket')
-        [evals, ~] = pla_val(train(:, 2:N), tag, w);
-    end
-    if evals.accuracy == 1
+    if e.accuracy == 1
         break;
     end
 end

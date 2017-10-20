@@ -1,6 +1,4 @@
-function [tag_s] = pla_test(test, w)
+function [predict] = pla_test(test, w)
 M = size(test, 1);
-test = [ones(M, 1) test];
-
-tag_s = sign((w*test')');
+predict = sign([ones(M, 1) test]*w');
 end

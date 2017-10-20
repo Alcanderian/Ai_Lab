@@ -15,6 +15,7 @@ P.iteration = 20;
 
 W = pla_train(M_T, Tag_T, P);
 save('w.mat', 'W', '-ascii');
+
 disp('train done.');
 disp(' ');
 
@@ -30,8 +31,9 @@ N = length(M_V(1, :))-1;
 Tag_V = M_V(:, N+1);
 M_V = M_V(:, 1:N);
 
-[Eval_V, Tag_R] = pla_val(M_V, Tag_V, W);
-disp('evalution of validation:'); 
+[Eval_V, ~] = pla_eval(Tag_V, pla_test(M_V, W));
+
+disp('evalution of validation:');
 disp(Eval_V);
 disp('validation done.');
 disp(' ');
@@ -46,8 +48,13 @@ end
 N = length(M_S(1, :))-1;
 
 M_S = M_S(:, 1:N);
-
 Tag_S = pla_test(M_S, W);
-save('result.mat', 'Tag_S', '-ascii');
+
+Res_S = fopen('result.csv', 'w');
+for i = 1:length(Tag_S)
+    fprintf(Res_S, '%d\n', int16(Tag_S(i)));
+end
+fclose(Res_S);
+
 disp('test done.');
 disp(' ');
