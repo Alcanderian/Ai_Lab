@@ -7,13 +7,16 @@ N = size(M_T, 2)-1;
 Tag_T = M_T(:, N+1);
 M_T = M_T(:, 1:N);
 
+P.mode = 'pocket';
 P.init = 'ones';
-P.progress = true;
+P.progress = 1;
 P.eval = 'f1';
-P.K = 20;
+P.iteration = 20;
 
 W = pla_train(M_T, Tag_T, P);
 save('w.mat', 'W', '-ascii');
+disp('train done.');
+disp(' ');
 
 %%
 % PLA validate session.
@@ -28,7 +31,10 @@ Tag_V = M_V(:, N+1);
 M_V = M_V(:, 1:N);
 
 [Eval_V, Tag_R] = pla_val(M_V, Tag_V, W);
+disp('evalution of validation:'); 
 disp(Eval_V);
+disp('validation done.');
+disp(' ');
 
 %%
 % PLA Test session.
@@ -43,3 +49,5 @@ M_S = M_S(:, 1:N);
 
 Tag_S = pla_test(M_S, W);
 save('result.mat', 'Tag_S', '-ascii');
+disp('test done.');
+disp(' ');

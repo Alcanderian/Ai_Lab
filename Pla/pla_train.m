@@ -1,35 +1,50 @@
 function [w] = pla_train(train, tag, param)
 % =============================================================================
-% Input args: 
+% input args:
 % -----------------------------------------------------------------------------
 % train:              train matrix, vector stored by row.
 % tag:                tag of each vector.
 % param:              struct include all parameter for pla.
+%   iteration:        number of iterations to perform.
+%   mode:             mode of traing, all method wil terminate when the
+%                       accuracy mactch 100%.
+%                       pocket: evalute every w and find the best w in all
+%                         result.
+%                       normal: perfrom K times of iteration without
+%                         evaluting every w.
 %   init:             method of initializing w.
-%                       'ones': use ones.
-%                       'zeros': use zeros.
-%                       'rand': use random values.
+%                       ones: use ones.
+%                       zeros: use zeros.
+%                       rand: use random values.
 %   progress:         if =1, evalution of each new best w is displayed.
 %   eval:             how to renew best w:
-%                       'f1': use f1 score to compare current w and the
+%                       f1: use f1 score to compare current w and the
 %                         known best w.
-%                       'accuracy': use f1 score to compare current w 
+%                       accuracy: use f1 score to compare current w
 %                         and the known best w.
-%   K:                number of iterations to perform. 
 % =============================================================================
 M = length(tag);
 N = size(train, 2)+1;
 train = [ones(M, 1) train];
 
 % prepareing params.
+if ~isfield(param, 'iteration')
+    param.iteration = 1;
+end
+if ~isfield(param, 'method')
+    param.mode = 'normal';
+end
 if ~isfield(param, 'init')
     param.init = 'ones';
 end
-if ~isfield(param, 'eval')
-    param.eval = 'accuracy';
-end
-if ~isfield(param, 'progress')
-    param.progress = 1;
+
+if strcmp(param.mode, 'pocket')
+    if ~isfield(param, 'eval')
+        param.eval = 'accuracy';
+    end
+    if ~isfield(param, 'progress')
+        param.progress = 1;
+    end
 end
 
 if strcmp(param.init, 'ones')
@@ -41,43 +56,52 @@ else
 end
 
 % init best w.
-b_e = pla_val(train(:, 2:N), tag, w);
-b_w = w;
+if strcmp(param.mode, 'pocket')
+    b_e = pla_val(train(:, 2:N), tag, w);
+    b_w = w;
+end
 
-for k = 1:param.K
+for k = 1:param.iteration
     for i = 1:M
         % predict one.
         if tag(i) ~= sign(w*train(i, :)')
             % renew w.
             w = w+tag(i)*train(i, :);
             
-            % eval current w.
-            [evals, ~] = pla_val(train(:, 2:N), tag, w);
-            
-            if param.eval == 'f1'
-                better = evals.f1 > b_e.f1;
-            else
-                better = evals.accuracy > b_e.accuracy;
-            end
-            
-            % renew bset w.
-            if better
-                b_e = evals;
-                b_w = w;
+            if strcmp(param.mode, 'pocket')
+                % eval current w.
+                [evals, ~] = pla_val(train(:, 2:N), tag, w);
                 
-                if param.progress
-                    disp(['iteration ', num2str(k),...
-                        ', found better ', param.eval, ':']);
-                    disp(b_e);
+                if strcmp(param.eval, 'f1')
+                    better = evals.f1 > b_e.f1;
+                else
+                    better = evals.accuracy > b_e.accuracy;
+                end
+                
+                % renew bset w.
+                if better
+                    b_e = evals;
+                    b_w = w;
+                    
+                    if param.progress
+                        disp(['iteration ', num2str(k),...
+                            ', found better self ', param.eval, ':']);
+                        disp(b_e);
+                    end
                 end
             end
         end
     end
     
+    if ~strcmp(param.mode, 'pocket')
+        [evals, ~] = pla_val(train(:, 2:N), tag, w);
+    end
     if evals.accuracy == 1
         break;
     end
 end
 
-w = b_w;
+if strcmp(param.mode, 'pocket')
+    w = b_w;
+end
 end
