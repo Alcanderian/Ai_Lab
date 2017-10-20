@@ -1,7 +1,7 @@
 function [w] = pla_train(train, tag, param)
-% =============================================================================
+% =========================================================================
 % input args:
-% -----------------------------------------------------------------------------
+% -------------------------------------------------------------------------
 % train:              train matrix, vector stored by row.
 % tag:                tag of each vector.
 % param:              struct include all parameter for pla.
@@ -22,7 +22,7 @@ function [w] = pla_train(train, tag, param)
 %                         known best w.
 %                       accuracy: use f1 score to compare current w
 %                         and the known best w.
-% =============================================================================
+% =========================================================================
 M = length(tag);
 N = size(train, 2)+1;
 train = [ones(M, 1) train];
