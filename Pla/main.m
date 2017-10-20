@@ -50,11 +50,7 @@ N = length(M_S(1, :))-1;
 M_S = M_S(:, 1:N);
 Tag_S = pla_test(M_S, W);
 
-Res_S = fopen('result.csv', 'w');
-for i = 1:length(Tag_S)
-    fprintf(Res_S, '%d\n', int16(Tag_S(i)));
-end
-fclose(Res_S);
+dlmwrite('result.csv', Tag_S);
 
 disp('test done.');
 disp(' ');
