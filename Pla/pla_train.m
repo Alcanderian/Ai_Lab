@@ -6,6 +6,9 @@ function [w] = pla_train(train, tag, param)
 % tag:                tag of each vector.
 % param:              struct include all parameter for pla.
 %   iteration:        number of iterations to perform.
+%   access:           how to access error vector.
+%                       random: random access.
+%                       ordered: ordered access.
 %   mode:             mode of traing, all method wil terminate when the
 %                       accuracy mactch 100%.
 %                       pocket: evalute every w and find the best w in all
@@ -37,14 +40,14 @@ end
 if ~isfield(param, 'init')
     param.init = 'ones';
 end
-
-if strcmp(param.mode, 'pocket')
-    if ~isfield(param, 'eval')
-        param.eval = 'accuracy';
-    end
-    if ~isfield(param, 'progress')
-        param.progress = 1;
-    end
+if ~isfield(param, 'progress')
+    param.progress = 1;
+end
+if ~isfield(param, 'eval')
+    param.eval = 'accuracy';
+end
+if ~isfield(param, 'access')
+    param.access = 'ordered';
 end
 
 if strcmp(param.init, 'ones')
@@ -57,11 +60,18 @@ end
 
 % init best w, err.
 [b_e, err] = pla_eval(tag, sign(train*w'));
-for k = 1:param.iteration
-    for i = 1:M
+
+%init loop.
+e = b_e; k = 1; perm = 1:M;
+while k <= param.iteration && e.accuracy ~= 1
+    if strcmp(param.access, 'random')
+        perm = randperm(M);
+    end
+    for i = perm
         if err(i)
             % renew current w.
             w = w+tag(i)*train(i, :);
+            
             % eval current w.
             [e, err] = pla_eval(tag, sign(train*w'));
             if strcmp(param.mode, 'pocket')
@@ -85,10 +95,11 @@ for k = 1:param.iteration
             end
         end
     end
-    
-    if e.accuracy == 1
-        break;
+    if ~strcmp(param.mode, 'pocket') && param.progress
+        disp(['iteration ', num2str(k), ' finished. ']);
+        disp(' ');
     end
+    k = k + 1;
 end
 
 if strcmp(param.mode, 'pocket')

@@ -12,6 +12,7 @@ P.init = 'ones';
 P.progress = 1;
 P.eval = 'f1';
 P.iteration = 550;
+P.access = 'ordered';
 
 W = pla_train(M_T, Tag_T, P);
 save('w.mat', 'W', '-ascii');
