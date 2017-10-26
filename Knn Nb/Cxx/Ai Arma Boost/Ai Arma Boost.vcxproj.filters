@@ -1,0 +1,167 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Test Files">
+      <UniqueIdentifier>{d1f2026e-5b02-4c1c-bf82-958f622839e9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\mats">
+      <UniqueIdentifier>{9bac6994-8e1d-44d1-ac7c-621a3e418a8f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\classification">
+      <UniqueIdentifier>{90572afd-a129-4611-895f-e211c0930668}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\regression">
+      <UniqueIdentifier>{eaa10b55-54f4-40c3-b630-ac8c6838ee62}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\nb_mats">
+      <UniqueIdentifier>{53f9d356-5ef5-446c-91ad-b7cff7ab5bb1}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="test_arma.cpp">
+      <Filter>Test Files</Filter>
+    </ClCompile>
+    <ClCompile Include="test_boost.cpp">
+      <Filter>Test Files</Filter>
+    </ClCompile>
+    <ClCompile Include="data_gen.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="fix_classi_csv.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="knn_predict.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="nb_predict.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="test_arma.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="test_boost.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="data_gen.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="fix_classi_csv.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="nb_predict.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="knn_predict.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="df.mat">
+      <Filter>Resource Files\mats</Filter>
+    </None>
+    <None Include="emoj_prob.mat">
+      <Filter>Resource Files\mats</Filter>
+    </None>
+    <None Include="idf.mat">
+      <Filter>Resource Files\mats</Filter>
+    </None>
+    <None Include="onehot.mat">
+      <Filter>Resource Files\mats</Filter>
+    </None>
+    <None Include="t.mat">
+      <Filter>Resource Files\mats</Filter>
+    </None>
+    <None Include="tf.mat">
+      <Filter>Resource Files\mats</Filter>
+    </None>
+    <None Include="tfidf.mat">
+      <Filter>Resource Files\mats</Filter>
+    </None>
+    <None Include="classification_fixed_train_set.csv">
+      <Filter>Resource Files\classification</Filter>
+    </None>
+    <None Include="classification_test_result.csv">
+      <Filter>Resource Files\classification</Filter>
+    </None>
+    <None Include="classification_test_set.csv">
+      <Filter>Resource Files\classification</Filter>
+    </None>
+    <None Include="classification_train_set.csv">
+      <Filter>Resource Files\classification</Filter>
+    </None>
+    <None Include="classification_validation_set.csv">
+      <Filter>Resource Files\classification</Filter>
+    </None>
+    <None Include="classification_verify_result.csv">
+      <Filter>Resource Files\classification</Filter>
+    </None>
+    <None Include="classification_test_train_set.csv">
+      <Filter>Resource Files\classification</Filter>
+    </None>
+    <None Include="regression_test_result.csv">
+      <Filter>Resource Files\regression</Filter>
+    </None>
+    <None Include="regression_test_set.csv">
+      <Filter>Resource Files\regression</Filter>
+    </None>
+    <None Include="regression_train_set.csv">
+      <Filter>Resource Files\regression</Filter>
+    </None>
+    <None Include="regression_validation_set.csv">
+      <Filter>Resource Files\regression</Filter>
+    </None>
+    <None Include="regression_verify_result.csv">
+      <Filter>Resource Files\regression</Filter>
+    </None>
+    <None Include="emoj_cnt.mat">
+      <Filter>Resource Files\nb_mats</Filter>
+    </None>
+    <None Include="emoj_word_cnt.mat">
+      <Filter>Resource Files\nb_mats</Filter>
+    </None>
+    <None Include="prob_emoj.mat">
+      <Filter>Resource Files\nb_mats</Filter>
+    </None>
+    <None Include="word_emoj_cnt.mat">
+      <Filter>Resource Files\nb_mats</Filter>
+    </None>
+    <None Include="word_emoj_obs.mat">
+      <Filter>Resource Files\nb_mats</Filter>
+    </None>
+    <None Include="word_emoj_unique.mat">
+      <Filter>Resource Files\nb_mats</Filter>
+    </None>
+    <None Include="classification_class_test_detail_result.csv">
+      <Filter>Resource Files\classification</Filter>
+    </None>
+    <None Include="classification_class_test_result.csv">
+      <Filter>Resource Files\classification</Filter>
+    </None>
+    <None Include="classification_class_test_set.csv">
+      <Filter>Resource Files\classification</Filter>
+    </None>
+    <None Include="classification_class_train_set.csv">
+      <Filter>Resource Files\classification</Filter>
+    </None>
+    <None Include="patterns_size.mat">
+      <Filter>Resource Files\nb_mats</Filter>
+    </None>
+  </ItemGroup>
+</Project>

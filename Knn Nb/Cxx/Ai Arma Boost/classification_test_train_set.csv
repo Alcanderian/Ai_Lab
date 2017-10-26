@@ -1,0 +1,4 @@
+Words (split by space),anger,disgust,fear,joy,sad,surprise
+good thanks,0,0,0,1,0,0
+no impressive thanks,0,0,0,0,1,0
+impressive good,0,0,0,1,0,0

@@ -7,15 +7,20 @@ N = size(M_T, 2)-1;
 Tag_T = M_T(:, N+1);
 M_T = M_T(:, 1:N);
 
+% RNG = load('rng.mat');
+% rng = RNG;
+RNG = rng;
+
 P.mode = 'pocket';
 P.init = 'ones';
 P.progress = 1;
 P.eval = 'f1';
 P.iteration = 550;
-P.access = 'ordered';
+P.access = 'random';
 
 W = pla_train(M_T, Tag_T, P);
-save('w.mat', 'W', '-ascii');
+% save('w.mat', 'W', '-ascii');
+% save('rng.mat', 'RNG');
 
 disp('train done.');
 disp(' ');
