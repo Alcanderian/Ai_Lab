@@ -1,0 +1,43 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.27004.2005
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "De Tree Cxx", "De Tree Cxx\De Tree Cxx.vcxproj", "{8179039A-6621-47FE-972B-0C5A0A9C5B8F}"
+EndProject
+Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "Validate", "Validate\Validate.pyproj", "{C4B6D337-4489-4D98-8192-B3506F8211D6}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|Any CPU = Release|Any CPU
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{8179039A-6621-47FE-972B-0C5A0A9C5B8F}.Debug|Any CPU.ActiveCfg = Debug|Win32
+		{8179039A-6621-47FE-972B-0C5A0A9C5B8F}.Debug|x64.ActiveCfg = Debug|x64
+		{8179039A-6621-47FE-972B-0C5A0A9C5B8F}.Debug|x64.Build.0 = Debug|x64
+		{8179039A-6621-47FE-972B-0C5A0A9C5B8F}.Debug|x86.ActiveCfg = Debug|Win32
+		{8179039A-6621-47FE-972B-0C5A0A9C5B8F}.Debug|x86.Build.0 = Debug|Win32
+		{8179039A-6621-47FE-972B-0C5A0A9C5B8F}.Release|Any CPU.ActiveCfg = Release|Win32
+		{8179039A-6621-47FE-972B-0C5A0A9C5B8F}.Release|x64.ActiveCfg = Release|x64
+		{8179039A-6621-47FE-972B-0C5A0A9C5B8F}.Release|x64.Build.0 = Release|x64
+		{8179039A-6621-47FE-972B-0C5A0A9C5B8F}.Release|x86.ActiveCfg = Release|Win32
+		{8179039A-6621-47FE-972B-0C5A0A9C5B8F}.Release|x86.Build.0 = Release|Win32
+		{C4B6D337-4489-4D98-8192-B3506F8211D6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C4B6D337-4489-4D98-8192-B3506F8211D6}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{C4B6D337-4489-4D98-8192-B3506F8211D6}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{C4B6D337-4489-4D98-8192-B3506F8211D6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C4B6D337-4489-4D98-8192-B3506F8211D6}.Release|x64.ActiveCfg = Release|Any CPU
+		{C4B6D337-4489-4D98-8192-B3506F8211D6}.Release|x86.ActiveCfg = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {5EB4C4E1-2965-44D3-840E-FC5E1385E012}
+	EndGlobalSection
+EndGlobal
