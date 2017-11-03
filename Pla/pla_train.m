@@ -74,6 +74,7 @@ while k <= param.iteration && e.accuracy ~= 1
             
             % eval current w.
             [e, err] = pla_eval(tag, sign(train*w'));
+            
             if strcmp(param.mode, 'pocket')
                 if strcmp(param.eval, 'f1')
                     better = e.f1 > b_e.f1;

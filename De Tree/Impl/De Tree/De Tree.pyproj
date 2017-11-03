@@ -2,15 +2,15 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>c4b6d337-4489-4d98-8192-b3506f8211d6</ProjectGuid>
+    <ProjectGuid>c1c0b077-3769-4198-ad74-e56fe94013c1</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>Validate.py</StartupFile>
+    <StartupFile>main.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
     <OutputPath>.</OutputPath>
-    <Name>Validate</Name>
-    <RootNamespace>Validate</RootNamespace>
+    <Name>De Tree</Name>
+    <RootNamespace>De Tree</RootNamespace>
     <InterpreterId>Global|VisualStudio|Intel Python 3.6 (64-bit)</InterpreterId>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
@@ -22,7 +22,25 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Validate.py" />
+    <Compile Include="data_op.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="de_tree.py" />
+    <Compile Include="entropy.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="gini.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="main.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="test.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="toolkit.py">
+      <SubType>Code</SubType>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <InterpreterReference Include="Global|VisualStudio|Intel Python 3.6 (64-bit)" />
