@@ -3,6 +3,7 @@ gini module, for CART.
 """
 import numpy as np
 import data_op
+import itertools
 
 
 def gini(mat):
@@ -21,53 +22,93 @@ def gini(mat):
     return gini_r
 
 
-def gini_continuous_split(mat, i, val):
+def gini_split(mat, i, val, op):
     """
     get gini split of i-th col split by val.
+
+    param:
+    :op: operator to select subset
     """
     gini_split_r = 0.0
-    for op in [lambda x, y: x > y, lambda x, y: x < y]:
-        subset = data_op.select_except_i(mat, i, val, op)
+    for lbd in [lambda x, y: op(x, y), lambda x, y: not op(x, y)]:
+        subset = data_op.select_except_i(mat, i, val, lbd)
         prob = len(subset) / float(len(mat))
         gini_split_r += prob * gini(subset)
     return gini_split_r
 
 
-def choose_gini_continuous(mat):
+def choose_gini(mat, get_splits):
     """
     choose best col and best split by gini slipt.
+
+    param:
+    :get_splits: function to get subset spliter
     """
     gini_m = gini(mat)
-    min_gini, min_index, min_split = float('-inf'), None, None
+    min_gini, min_index = float('-inf'), None
+    min_split, operator = None, None
     for i in range(len(mat[0]) - 1):
-        vals = sorted(np.unique(mat[:, i]))
+        vals = np.unique(mat[:, i])
         if len(vals) == 1:
             continue
-        splits = [(vals[j] + vals[j + 1]) / 2 for j in range(len(vals) - 1)]
-        ginis = [gini_continuous_split(mat, i, split) for split in splits]
+        splits, op = get_splits(vals)
+        ginis = [gini_split(mat, i, split, op) for split in splits]
         index = np.argmin(ginis)
         if ginis[index] > min_gini:
-            min_gini, min_index, min_split = ginis[index], i, splits[index]
-    return {'gini': min_gini, 'index': min_index, 'split': min_split}
+            min_gini, min_index = ginis[index], i
+            min_split, operator = splits[index], op
+    return {'gini': min_gini, 'index': min_index, 
+            'split': min_split, 'operator': operator}
 
 
-def gini_continuous_subset(mat, args):
+def gini_get_splits_continuous(vals):
+    """
+    get split thesholds of continuous values.
+
+    return: subset spliter, operator to select subset
+    """
+    vals = sorted(vals)
+    splits = [(vals[i] + vals[i + 1]) / 2 for i in range(len(vals) - 1)]
+    return splits, data_op.lt
+
+
+def gini_get_splits_smart_discrete(vals):
+    """
+    get splits smartly.
+    if len(vals) > 6, treat vals as continuous values.
+    otherwise treat them as discrete values and
+    get split set of vals.
+
+    return: subset spliter, operator to select subset
+    """
+    if len(vals) == 2:
+        return [(vals[0],)], data_op.contains
+    if len(vals) > 10:
+        return gini_get_splits_continuous(vals)
+    splits = []
+    for k in range(1, int(len(vals) / 2) + 1):
+        splits.extend(itertools.combinations(vals, k))
+    return splits, data_op.contains
+
+
+def gini_subset(mat, args):
     """
     get subsets.
-    partition func: val < split
     """
-    index, split, subsets = args['index'], args['split'], []
-    for op in [lambda x, y: x > y, lambda x, y: x < y]:
-        subsets.append(data_op.select_except_i(mat, index, split, op))
-    return subsets, ['x > ' + str(split), 'x < ' + str(split)]
+    index, split = args['index'], args['split']
+    op, subsets = args['operator'], []
+    fmt = (op.__name__, str(split))
+    for lbd in [lambda x, y: op(x, y), lambda x, y: not op(x, y)]:
+        subsets.append(data_op.select_except_i(mat, index, split, lbd))
+    return subsets, ['%s(x, %s)'%fmt, '~%s(x, %s)'%fmt]
 
 
-def gini_continuous_partition(val, args):
+def gini_partition(val, args):
     """
     get partition label of val.
     """
-    split = args['split']
-    if val < split:
-        return 'x < ' + str(split)
+    fmt = (args['operator'].__name__, str(args['split']))
+    if args['operator'](val, args['split']):
+        return '%s(x, %s)'%fmt
     else:
-        return 'x > ' + str(split)
+        return '~%s(x, %s)'%fmt

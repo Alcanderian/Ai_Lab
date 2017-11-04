@@ -28,7 +28,7 @@ def condition_entropy(mat, i):
     elems = np.unique(mat[:, i])
     condition_entropy_r = 0.0
     for elem in elems:
-        subset = data_op.select_except_i(mat, i, elem, lambda x, y: x == y)
+        subset = data_op.select_except_i(mat, i, elem, data_op.eq)
         prob = len(subset) / float(len(mat))
         condition_entropy_r += prob * entropy(subset)
     return condition_entropy_r
@@ -70,7 +70,7 @@ def entropy_subset(mat, args):
     """
     get subsets.
     """
-    subsets, index, op = [], args['index'], lambda x, y: x == y
+    subsets, index, op = [], args['index'], data_op.eq
     elems = np.unique(mat[:, index])
     for elem in elems:
         subsets.append(data_op.select_except_i(mat, index, elem, op))

@@ -6,39 +6,48 @@ import entropy as en
 
 
 class id3:
-    def choose(mat):
-        return en.choose_information_gain(mat)
-
-
-    def subset(mat, args):
-        return en.entropy_subset(mat, args)
-
-
-    def partition(val, args):
-        return en.entropy_partition(val, args)
+    """
+    ID3 module.
+    """
+    choose = en.choose_information_gain
+    subset = en.entropy_subset
+    partition = en.entropy_partition
 
 
 class c45:
-    def choose(mat):
-        return en.choose_information_gain_rate(mat)
-
-
-    def subset(mat, args):
-        return en.entropy_subset(mat, args)
-
-
-    def partition(val, args):
-        return en.entropy_partition(val, args)
+    """
+    C4.5 module.
+    """
+    choose = en.choose_information_gain_rate
+    subset = en.entropy_subset
+    partition = en.entropy_partition
 
 
 class ccart:
+    """
+    continuous-CART module.
+    """
     def choose(mat):
-        return gi.choose_gini_continuous(mat)
+        """
+        choose best col and best split by continuous gini slipt.
+        """
+        return gi.choose_gini(mat, gi.gini_get_splits_continuous)
 
 
-    def subset(mat, args):
-        return gi.gini_continuous_subset(mat, args)
+    subset = gi.gini_subset
+    partition = gi.gini_partition
 
 
-    def partition(val, args):
-        return gi.gini_continuous_partition(val, args)
+class sdcart:
+    """
+    smart-discrete-CART module.
+    """
+    def choose(mat):
+        """
+        choose best col and best split by discrete gini slipt.
+        """
+        return gi.choose_gini(mat, gi.gini_get_splits_smart_discrete)
+
+
+    subset = gi.gini_subset
+    partition = gi.gini_partition

@@ -16,3 +16,24 @@ def select_except_i(mat, i, val, op):
         if op(vec[i], val):
             subset.append(np.append(vec[:i], vec[i + 1:]))
     return np.array(subset)
+
+
+def lt(x, y):
+    """
+    x < y
+    """
+    return x < y
+
+
+def contains(x, y):
+    """
+    x in y
+    """
+    return x in y
+
+
+def eq(x, y):
+    """
+    x == y
+    """
+    return x == y
