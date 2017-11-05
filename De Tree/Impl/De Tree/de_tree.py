@@ -56,5 +56,17 @@ def train(mat, heads=None, toolkit=id3):
     return node
 
 
-def test(tree, mat):
-    return
+def predict(tree, mat):
+    """
+    predict tags of vec in mat.
+    """
+    tags = []
+    for vec in mat:
+        node = tree
+        while not is_leaf(node):
+            args = node['args']
+            val = vec[args['index']]
+            partition = node['toolkit'].partition(val, args)
+            node = node['children'][partition]
+        tags.append(node['tag'])
+    return tags

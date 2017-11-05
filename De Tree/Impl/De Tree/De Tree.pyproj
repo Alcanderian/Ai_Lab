@@ -4,7 +4,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>c1c0b077-3769-4198-ad74-e56fe94013c1</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>main.py</StartupFile>
+    <StartupFile>predict.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
@@ -32,15 +32,11 @@
     <Compile Include="gini.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="main.py">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="test.py">
-      <SubType>Code</SubType>
-    </Compile>
+    <Compile Include="predict.py" />
     <Compile Include="toolkit.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="train.py" />
   </ItemGroup>
   <ItemGroup>
     <InterpreterReference Include="Global|VisualStudio|Intel Python 3.6 (64-bit)" />
