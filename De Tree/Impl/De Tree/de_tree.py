@@ -56,6 +56,30 @@ def train(mat, heads=None, toolkit=id3):
     return node
 
 
+def plotable(tree):
+    """
+    let the tree be plotable by treePlotter.py
+    """
+    if is_leaf(tree):
+        return tree['tag']
+    index = tree['args']['index']
+    node = {index: tree['children']}
+    for key in node[index].keys():
+        node[index][key] = plotable(node[index][key])
+    return node
+
+
+def nearest_neighbor(label, neighbors):
+    """
+    get the nearest neighbor of the unknown label,
+    only use in complex tree's prediction.
+    """
+    neighbors = list(neighbors)
+    distances = np.abs(np.array(neighbors) - label)
+    index = np.argmin(distances)
+    return neighbors[index]
+
+
 def predict(tree, mat):
     """
     predict tags of vec in mat.
@@ -67,6 +91,9 @@ def predict(tree, mat):
             args = node['args']
             val = vec[args['index']]
             partition = node['toolkit'].partition(val, args)
+            if partition not in node['children']:
+                partition = nearest_neighbor(
+                    partition, node['children'].keys())
             node = node['children'][partition]
         tags.append(node['tag'])
     return tags
