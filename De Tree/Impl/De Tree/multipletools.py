@@ -1,5 +1,5 @@
 """
-data tools for complex tree.
+data tools for multiple tree.
 """
 import numpy as np
 import datatools as dt
@@ -7,16 +7,16 @@ import datatools as dt
 
 def condition_eval(mat, i, elems, efunc):
     """
-    for complex tree.
+    for multiple tree.
     get conditional information evalution of i-th col.
 
-    param:
-    :elems: elem set of data
-    :efunc: evalution function of data
+    :param:
+    elems: elem set of data
+    efunc: evalution function of data
     """
     condition_eval_r = 0.0
     for elem in elems:
-        subset = dt.select_except_i(mat, i, elem, dt.eq)
+        subset = dt.select(mat, i, elem, dt.eq)
         prob = len(subset) / float(len(mat))
         condition_eval_r += prob * efunc(subset)
     return condition_eval_r
@@ -24,12 +24,12 @@ def condition_eval(mat, i, elems, efunc):
 
 def choose(mat, efunc, cmethod):
     """
-    for complex tree.
+    for multiple tree.
     choose best col by information evalution gain.
 
-    param:
-    :efunc: evalution function of data
-    :cmethod: choose method, 'gain' or 'gain_rate'
+    :param:
+    efunc: evalution function of data
+    cmethod: choose method, 'gain' or 'gain_rate'
     """
     max_diff, max_index = float('-inf'), None
     if cmethod != 'gain' and cmethod != 'gain_rate':
@@ -49,7 +49,7 @@ def choose(mat, efunc, cmethod):
 
 def subset(mat, args):
     """
-    get complex subsets.
+    get multiple subsets.
     """
     subsets, index, op = [], args['index'], dt.eq
     elems = np.unique(mat[:, index])
@@ -60,6 +60,6 @@ def subset(mat, args):
 
 def partition(val, args):
     """
-    get complex partition label of val.
+    get multiple partition label of val.
     """
     return val

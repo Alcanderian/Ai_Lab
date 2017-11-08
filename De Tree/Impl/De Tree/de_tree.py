@@ -3,7 +3,7 @@ implement of de tree.
 """
 import numpy as np
 import datatools as dt
-from toolkit import complex
+from toolkit import multiple
 
 
 def max_tag(mat):
@@ -26,33 +26,50 @@ def is_leaf(node):
     return 'children' not in node
 
 
-def train(mat, heads=None, toolkit=complex.id3):
+def train(mat, heads=None, toolkit=multiple.id3, 
+          max_depth=float('inf'), depth=0):
     """
-    struct of non-leaf:
-    {'toolkit': toolkit, 'args': args, 'children': {label: child_node,...}}
-    struct of leaf:
+    :struct of non-leaf: {
+        'toolkit': toolkit,
+        'args': args,
+        'children: {
+            label: child_node,...
+        }
+    }
+
+    :struct of leaf:
     {'tag': tag}
 
-    param:
-    :heads: original column indices, do not pass it manually.
+    :param:
+    heads: original column indices, do not pass it manually.
+    depth: auto increment value, do not pass it manually.
+
+    we should reuse the column when there is continuous split.
     """
+    if max_depth < 0:
+        return None
     if len(np.unique(mat[:, -1])) == 1:
         return {'tag': mat[0][-1]}
     if len(mat[0]) == 1:
         return {'tag': max_tag(mat)}
     args = toolkit.choose(mat)
-    if args['index'] is None:
+    index = args['index']
+    # [!]: or max_depth == depth
+    if index is None or max_depth == depth:
         return {'tag': max_tag(mat)}
     if heads is None:
         heads = np.array(range(len(mat[0]) - 1))
     subsets, partitions = toolkit.subset(mat, args)
-    subheads = dt.select_except_i(
-        [heads], args['index'], heads[args['index']], dt.eq)[0]
+    if dt.is_continuous_split(args):
+        subheads = heads.copy()
+    else:
+        subheads = np.append(heads[:index], heads[index + 1:])
     # assign args['index'] to index of origin mat.
     args['index'] = heads[args['index']]
     node = {'toolkit': toolkit, 'args': args, 'children': {}}
     for subset, partition in zip(subsets, partitions):
-        node['children'][partition] = train(subset, subheads, toolkit)
+        node['children'][partition] = train(subset, subheads, toolkit,
+                                            max_depth, depth + 1)
     return node
 
 
@@ -100,13 +117,16 @@ def predict(tree, mat):
 
 
 def validation(tree, mat):
+    """
+    validate and evalute the tree.
+    """
     actual, result = mat[:, -1], predict(tree, mat)
     sums = {1: {1: 0.0, -1: 0.0}, -1: {1: 0.0, -1: 0.0}}
     for i, j in zip(actual, result):
         sums[int(i)][int(j)] += 1.0
-    eval = {'accuary': (sums[1][1] + sums[-1][-1]) / len(actual),
+    eval = {'accuracy': (sums[1][1] + sums[-1][-1]) / len(actual),
             'precision': sums[1][1] / (sums[1][1] + sums[-1][1]),
             'recall': sums[1][1] / (sums[1][1] + sums[1][-1])}
-    eval['f1'] = (2 * eval['precision'] * eval['recall'] 
+    eval['f1'] = (2 * eval['precision'] * eval['recall']
                   / (eval['precision'] + eval['recall']))
     return eval

@@ -25,9 +25,6 @@
     <Compile Include="binarytools.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="complextools.py">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="datatools.py">
       <SubType>Code</SubType>
     </Compile>
@@ -38,6 +35,7 @@
     <Compile Include="gini.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="multipletools.py" />
     <Compile Include="predict.py" />
     <Compile Include="toolkit.py">
       <SubType>Code</SubType>

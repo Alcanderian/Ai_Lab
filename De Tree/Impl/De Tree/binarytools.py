@@ -11,14 +11,14 @@ def condition_eval(mat, i, split, efunc, eop):
     for binary tree.
     get conditional information evalution of i-th col.
 
-    param:
-    :split: spliter of data
-    :efunc: evalution function of data
-    :eop: select opreator of data
+    :param:
+    split: spliter of data
+    efunc: evalution function of data
+    eop: select opreator of data
     """
     condition_eval_r = 0.0
     for lbd in [lambda x, y: eop(x, y), lambda x, y: not eop(x, y)]:
-        subset = dt.select_except_i(mat, i, split, lbd)
+        subset = dt.select(mat, i, split, lbd)
         prob = len(subset) / float(len(mat))
         condition_eval_r += prob * efunc(subset)
     return condition_eval_r
@@ -29,10 +29,10 @@ def splits_eval(mat, i, splits, efunc, eop):
     for binary tree.
     get information evalution of i-th col with split.
 
-    param:
-    :splits: spliters of data
-    :efunc: evalution function of data
-    :eop: select opreator of data
+    :param:
+    splits: spliters of data
+    efunc: evalution function of data
+    eop: select opreator of data
     """
     evals = []
     for split in splits:
@@ -46,15 +46,15 @@ def choose(mat, efunc, spfunc, cmethod):
     for binary tree.
     choose best col by information evalution gain.
 
-    param:
-    :efunc: evalution function of data
-    :spfunc: split function of data
-    :cmethod: choose method, 'gain' or 'gain_rate'
+    :param:
+    efunc: evalution function of data
+    spfunc: split function of data
+    cmethod: choose method, 'gain' or 'gain_rate'
     """
     max_diff, max_index = float('-inf'), None
     max_split, operator = None, None
     if cmethod != 'gain' and cmethod != 'gain_rate':
-        return {cmethod: max_diff, 'index': max_index, 
+        return {cmethod: max_diff, 'index': max_index,
                 'split': max_split, 'operator': operator}
     eval_m = efunc(mat)
     for i in range(len(mat[0]) - 1):
@@ -63,14 +63,14 @@ def choose(mat, efunc, spfunc, cmethod):
             continue
         splits, op = spfunc(vals)
         diffs = [eval_m - condition_eval(mat, i, split, efunc, op)
-                for split in splits]
+                 for split in splits]
         if cmethod == 'gain_rate':
             diffs = diffs / splits_eval(mat, i, splits, efunc, op)
         index = np.argmax(diffs)
         if diffs[index] > max_diff:
             max_diff, max_index = diffs[index], i
             max_split, operator = splits[index], op
-    return {cmethod: max_diff, 'index': max_index, 
+    return {cmethod: max_diff, 'index': max_index,
             'split': max_split, 'operator': operator}
 
 
@@ -107,13 +107,17 @@ def splits_smart_discrete(vals):
 def subset(mat, args):
     """
     get binary subsets.
+    we should reuse the column when there is continuous split.
     """
     index, split = args['index'], args['split']
     op, subsets = args['operator'], []
     fmt = (op.__name__, str(split))
     for lbd in [lambda x, y: op(x, y), lambda x, y: not op(x, y)]:
-        subsets.append(dt.select_except_i(mat, index, split, lbd))
-    return subsets, ['%s(x, %s)'%fmt, '~%s(x, %s)'%fmt]
+        if dt.is_continuous_split(args):
+            subsets.append(dt.select(mat, index, split, lbd))
+        else:
+            subsets.append(dt.select_except_i(mat, index, split, lbd))
+    return subsets, ['%s(x, %s)' % fmt, '~%s(x, %s)' % fmt]
 
 
 def partition(val, args):
@@ -122,6 +126,6 @@ def partition(val, args):
     """
     fmt = (args['operator'].__name__, str(args['split']))
     if args['operator'](val, args['split']):
-        return '%s(x, %s)'%fmt
+        return '%s(x, %s)' % fmt
     else:
-        return '~%s(x, %s)'%fmt
+        return '~%s(x, %s)' % fmt

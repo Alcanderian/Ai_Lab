@@ -4,47 +4,42 @@ decision tree's toolkit
 import gini as gi
 import entropy as en
 import binarytools as bt
-import complextools as ct
+import multipletools as mt
 
 
-class complex:
+class multiple:
     """
-    complex tree warpper.
+    multiple tree warpper.
     """
     class id3:
         """
-        warpper, complex-ID3 module.
+        warpper, multiple-ID3 module.
         """
         def choose(mat):
-            return ct.choose(mat, en.entropy, 'gain')
+            return mt.choose(mat, en.entropy, 'gain')
 
-
-        subset = ct.subset
-        partition = ct.partition
-
+        subset = mt.subset
+        partition = mt.partition
 
     class c45:
         """
-        warpper, complex-C4.5 module.
+        warpper, multiple-C4.5 module.
         """
         def choose(mat):
-            return ct.choose(mat, en.entropy, 'gain_rate')
+            return mt.choose(mat, en.entropy, 'gain_rate')
 
-
-        subset = ct.subset
-        partition = ct.partition
-
+        subset = mt.subset
+        partition = mt.partition
 
     class cart:
         """
-        warpper, complex-CART module.
+        warpper, multiple-CART module.
         """
         def choose(mat):
-            return ct.choose(mat, gi.gini, 'gain')
+            return mt.choose(mat, gi.gini, 'gain')
 
-
-        subset = ct.subset
-        partition = ct.partition
+        subset = mt.subset
+        partition = mt.partition
 
 
 class binary:
@@ -62,22 +57,19 @@ class binary:
             def choose(mat):
                 return bt.choose(mat, en.entropy, bt.splits_continuous, 'gain')
 
-
             subset = bt.subset
             partition = bt.partition
-
 
         class c45:
             """
             warpper, binary-continuous-C4.5 module.
             """
             def choose(mat):
-                return bt.choose(mat, en.entropy, bt.splits_continuous, 'gain_rate')
-
+                return bt.choose(mat, en.entropy,
+                                 bt.splits_continuous, 'gain_rate')
 
             subset = bt.subset
             partition = bt.partition
-
 
         class cart:
             """
@@ -86,10 +78,8 @@ class binary:
             def choose(mat):
                 return bt.choose(mat, gi.gini, bt.splits_continuous, 'gain')
 
-
             subset = bt.subset
             partition = bt.partition
-
 
     class discrete:
         """
@@ -100,32 +90,30 @@ class binary:
             warpper, binary-smart-discrete-ID3 module.
             """
             def choose(mat):
-                return bt.choose(mat, en.entropy, bt.splits_smart_discrete, 'gain')
-
+                return bt.choose(mat, en.entropy,
+                                 bt.splits_smart_discrete, 'gain')
 
             subset = bt.subset
             partition = bt.partition
-
 
         class c45:
             """
             warpper, binary-smart-discrete-C4.5 module.
             """
             def choose(mat):
-                return bt.choose(mat, en.entropy, bt.splits_smart_discrete, 'gain_rate')
-
+                return bt.choose(mat, en.entropy,
+                                 bt.splits_smart_discrete, 'gain_rate')
 
             subset = bt.subset
             partition = bt.partition
-
 
         class cart:
             """
             warpper, binary-smart-discrete-CART module.
             """
             def choose(mat):
-                return bt.choose(mat, gi.gini, bt.splits_smart_discrete, 'gain')
-
+                return bt.choose(mat, gi.gini,
+                                 bt.splits_smart_discrete, 'gain')
 
             subset = bt.subset
             partition = bt.partition
