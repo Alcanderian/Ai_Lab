@@ -9,7 +9,7 @@ def select_except_i(mat, i, val, op):
     sql:
     select *
     from mat - mat[*][i]
-    where op(mat[*][i], val) is true.
+    where op(mat[*][i], val) is True.
     """
     subset = []
     for vec in mat:

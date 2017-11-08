@@ -4,7 +4,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>c1c0b077-3769-4198-ad74-e56fe94013c1</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>predict.py</StartupFile>
+    <StartupFile>train.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
@@ -22,7 +22,13 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="data_op.py">
+    <Compile Include="binarytools.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="complextools.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="datatools.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="de_tree.py" />

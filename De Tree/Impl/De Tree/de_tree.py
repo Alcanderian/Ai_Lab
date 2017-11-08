@@ -2,8 +2,8 @@
 implement of de tree.
 """
 import numpy as np
-import data_op
-from toolkit import id3
+import datatools as dt
+from toolkit import complex
 
 
 def max_tag(mat):
@@ -26,7 +26,7 @@ def is_leaf(node):
     return 'children' not in node
 
 
-def train(mat, heads=None, toolkit=id3):
+def train(mat, heads=None, toolkit=complex.id3):
     """
     struct of non-leaf:
     {'toolkit': toolkit, 'args': args, 'children': {label: child_node,...}}
@@ -46,8 +46,8 @@ def train(mat, heads=None, toolkit=id3):
     if heads is None:
         heads = np.array(range(len(mat[0]) - 1))
     subsets, partitions = toolkit.subset(mat, args)
-    subheads = data_op.select_except_i(
-        [heads], args['index'], heads[args['index']], data_op.eq)[0]
+    subheads = dt.select_except_i(
+        [heads], args['index'], heads[args['index']], dt.eq)[0]
     # assign args['index'] to index of origin mat.
     args['index'] = heads[args['index']]
     node = {'toolkit': toolkit, 'args': args, 'children': {}}
@@ -97,3 +97,16 @@ def predict(tree, mat):
             node = node['children'][partition]
         tags.append(node['tag'])
     return tags
+
+
+def validation(tree, mat):
+    actual, result = mat[:, -1], predict(tree, mat)
+    sums = {1: {1: 0.0, -1: 0.0}, -1: {1: 0.0, -1: 0.0}}
+    for i, j in zip(actual, result):
+        sums[int(i)][int(j)] += 1.0
+    eval = {'accuary': (sums[1][1] + sums[-1][-1]) / len(actual),
+            'precision': sums[1][1] / (sums[1][1] + sums[-1][1]),
+            'recall': sums[1][1] / (sums[1][1] + sums[1][-1])}
+    eval['f1'] = (2 * eval['precision'] * eval['recall'] 
+                  / (eval['precision'] + eval['recall']))
+    return eval

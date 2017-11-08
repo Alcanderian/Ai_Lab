@@ -3,51 +3,129 @@ decision tree's toolkit
 """
 import gini as gi
 import entropy as en
+import binarytools as bt
+import complextools as ct
 
 
-class id3:
+class complex:
     """
-    ID3 module.
+    complex tree warpper.
     """
-    choose = en.choose_information_gain
-    subset = en.entropy_subset
-    partition = en.entropy_partition
-
-
-class c45:
-    """
-    C4.5 module.
-    """
-    choose = en.choose_information_gain_rate
-    subset = en.entropy_subset
-    partition = en.entropy_partition
-
-
-class ccart:
-    """
-    continuous-CART module.
-    """
-    def choose(mat):
+    class id3:
         """
-        choose best col and best split by continuous gini slipt.
+        warpper, complex-ID3 module.
         """
-        return gi.choose_gini(mat, gi.gini_get_splits_continuous)
+        def choose(mat):
+            return ct.choose(mat, en.entropy, 'gain')
 
 
-    subset = gi.gini_subset
-    partition = gi.gini_partition
+        subset = ct.subset
+        partition = ct.partition
 
 
-class sdcart:
+    class c45:
+        """
+        warpper, complex-C4.5 module.
+        """
+        def choose(mat):
+            return ct.choose(mat, en.entropy, 'gain_rate')
+
+
+        subset = ct.subset
+        partition = ct.partition
+
+
+    class cart:
+        """
+        warpper, complex-CART module.
+        """
+        def choose(mat):
+            return ct.choose(mat, gi.gini, 'gain')
+
+
+        subset = ct.subset
+        partition = ct.partition
+
+
+class binary:
     """
-    smart-discrete-CART module.
+    binary tree warpper.
     """
-    def choose(mat):
+    class continuous:
         """
-        choose best col and best split by discrete gini slipt.
+        split binary continuous.
         """
-        return gi.choose_gini(mat, gi.gini_get_splits_smart_discrete)
+        class id3:
+            """
+            warpper, binary-continuous-ID3 module.
+            """
+            def choose(mat):
+                return bt.choose(mat, en.entropy, bt.splits_continuous, 'gain')
 
 
-    subset = gi.gini_subset
-    partition = gi.gini_partition
+            subset = bt.subset
+            partition = bt.partition
+
+
+        class c45:
+            """
+            warpper, binary-continuous-C4.5 module.
+            """
+            def choose(mat):
+                return bt.choose(mat, en.entropy, bt.splits_continuous, 'gain_rate')
+
+
+            subset = bt.subset
+            partition = bt.partition
+
+
+        class cart:
+            """
+            warpper, binary-continuous-CART module.
+            """
+            def choose(mat):
+                return bt.choose(mat, gi.gini, bt.splits_continuous, 'gain')
+
+
+            subset = bt.subset
+            partition = bt.partition
+
+
+    class discrete:
+        """
+        split binary discrete smartly.
+        """
+        class id3:
+            """
+            warpper, binary-smart-discrete-ID3 module.
+            """
+            def choose(mat):
+                return bt.choose(mat, en.entropy, bt.splits_smart_discrete, 'gain')
+
+
+            subset = bt.subset
+            partition = bt.partition
+
+
+        class c45:
+            """
+            warpper, binary-smart-discrete-C4.5 module.
+            """
+            def choose(mat):
+                return bt.choose(mat, en.entropy, bt.splits_smart_discrete, 'gain_rate')
+
+
+            subset = bt.subset
+            partition = bt.partition
+
+
+        class cart:
+            """
+            warpper, binary-smart-discrete-CART module.
+            """
+            def choose(mat):
+                return bt.choose(mat, gi.gini, bt.splits_smart_discrete, 'gain')
+
+
+            subset = bt.subset
+            partition = bt.partition
