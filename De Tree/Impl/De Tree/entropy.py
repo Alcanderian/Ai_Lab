@@ -4,6 +4,7 @@ entropy module.
 import numpy as np
 from datatools import count_each_tag
 
+
 def entropy(mat):
     """
     get entropy.

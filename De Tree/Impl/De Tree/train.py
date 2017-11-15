@@ -5,16 +5,26 @@ import numpy as np
 import datatools as dt
 import toolkit
 import pickle
-import de_tree
+import decision_tree
+import random_forest
 import random
 m = np.loadtxt('../../Data/train.csv', delimiter=',')
 perm = list(range(len(m)))
-for i in range(30):
-    random.shuffle(perm)
+random.shuffle(perm)
 perm = np.array(perm)
-mt = m[perm[range(int(len(perm) * 0.6))]]
-mv = m[perm[range(int(len(perm) * 0.6), len(perm))]]
-t = de_tree.train(m)
-print(de_tree.validation(t, m))
+#mt = m[perm[range(int(len(perm) * 0.7))]]
+#mv = m[perm[range(int(len(perm) * 0.7), len(perm))]]
+mt = np.loadtxt('../../Data/magictrain.csv', delimiter=',')
+mv = np.loadtxt('../../Data/magicvalid.csv', delimiter=',')
+f = random_forest.train(mt, toolkit.multiple.cart, 6, 1024)
+t = decision_tree.train(mt, toolkit=toolkit.binary.discrete.cart)
+# validation
+print(random_forest.validation(f, mt))
+print(random_forest.validation(f, mv))
+print(decision_tree.validation(t, mt))
+print(decision_tree.validation(t, mv))
+# write binary
+with open('../../Data/forest.pyv', 'wb') as val:
+    pickle.dump(f, val)
 with open('../../Data/tree.pyv', 'wb') as val:
     pickle.dump(t, val)

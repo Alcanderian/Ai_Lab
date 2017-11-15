@@ -53,23 +53,21 @@ def choose(mat, efunc, spfunc, cmethod):
     """
     max_diff, max_index = float('-inf'), None
     max_split, operator = None, None
-    if cmethod != 'gain' and cmethod != 'gain_rate':
-        return {cmethod: max_diff, 'index': max_index,
-                'split': max_split, 'operator': operator}
-    eval_m = efunc(mat)
-    for i in range(len(mat[0]) - 1):
-        vals = np.unique(mat[:, i])
-        if len(vals) == 1:
-            continue
-        splits, op = spfunc(vals)
-        diffs = [eval_m - condition_eval(mat, i, split, efunc, op)
-                 for split in splits]
-        if cmethod == 'gain_rate':
-            diffs = diffs / splits_eval(mat, i, splits, efunc, op)
-        index = np.argmax(diffs)
-        if diffs[index] > max_diff:
-            max_diff, max_index = diffs[index], i
-            max_split, operator = splits[index], op
+    if cmethod == 'gain' or cmethod == 'gain_rate':
+        eval_m = efunc(mat)
+        for i in range(len(mat[0]) - 1):
+            vals = np.unique(mat[:, i])
+            if len(vals) == 1:
+                continue
+            splits, op = spfunc(vals)
+            diffs = [eval_m - condition_eval(mat, i, split, efunc, op)
+                     for split in splits]
+            if cmethod == 'gain_rate':
+                diffs = diffs / splits_eval(mat, i, splits, efunc, op)
+            index = np.argmax(diffs)
+            if diffs[index] > max_diff:
+                max_diff, max_index = diffs[index], i
+                max_split, operator = splits[index], op
     return {cmethod: max_diff, 'index': max_index,
             'split': max_split, 'operator': operator}
 

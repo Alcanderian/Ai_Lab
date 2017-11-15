@@ -32,18 +32,17 @@ def choose(mat, efunc, cmethod):
     cmethod: choose method, 'gain' or 'gain_rate'
     """
     max_diff, max_index = float('-inf'), None
-    if cmethod != 'gain' and cmethod != 'gain_rate':
-        {cmethod: max_diff, 'index': max_index}
-    eval_m = efunc(mat)
-    for i in range(len(mat[0]) - 1):
-        splits = np.unique(mat[:, i])
-        diff = eval_m - condition_eval(mat, i, splits, efunc)
-        if diff == 0:
-            continue
-        if cmethod == 'gain_rate':
-            diff = diff / efunc(mat[:, i:i + 1])
-        if diff > max_diff:
-            max_diff, max_index = diff, i
+    if cmethod == 'gain' or cmethod == 'gain_rate':
+        eval_m = efunc(mat)
+        for i in range(len(mat[0]) - 1):
+            splits = np.unique(mat[:, i])
+            diff = eval_m - condition_eval(mat, i, splits, efunc)
+            if diff == 0:
+                continue
+            if cmethod == 'gain_rate':
+                diff = diff / efunc(mat[:, i:i + 1])
+            if diff > max_diff:
+                max_diff, max_index = diff, i
     return {cmethod: max_diff, 'index': max_index}
 
 

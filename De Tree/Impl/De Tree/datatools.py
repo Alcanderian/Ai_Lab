@@ -48,6 +48,21 @@ def is_continuous_split(args):
     return 'split' in args and isinstance(args['split'], float)
 
 
+def evalution(actual, result):
+    """
+    evalution of result.
+    """
+    sums = {1: {1: 0.0, -1: 0.0}, -1: {1: 0.0, -1: 0.0}}
+    for i, j in zip(actual, result):
+        sums[int(i)][int(j)] += 1.0
+    eval = {'accuracy': (sums[1][1] + sums[-1][-1]) / len(actual),
+            'precision': sums[1][1] / (sums[1][1] + sums[-1][1]),
+            'recall': sums[1][1] / (sums[1][1] + sums[1][-1])}
+    eval['f1'] = (2 * eval['precision'] * eval['recall']
+                  / (eval['precision'] + eval['recall']))
+    return eval
+
+
 def lt(x, y):
     """
     x < y

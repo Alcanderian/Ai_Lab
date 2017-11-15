@@ -4,7 +4,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>c1c0b077-3769-4198-ad74-e56fe94013c1</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>train.py</StartupFile>
+    <StartupFile>test.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
@@ -28,7 +28,7 @@
     <Compile Include="datatools.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="de_tree.py" />
+    <Compile Include="decision_tree.py" />
     <Compile Include="entropy.py">
       <SubType>Code</SubType>
     </Compile>
@@ -37,6 +37,12 @@
     </Compile>
     <Compile Include="multipletools.py" />
     <Compile Include="predict.py" />
+    <Compile Include="random_forest.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="test.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="toolkit.py">
       <SubType>Code</SubType>
     </Compile>
