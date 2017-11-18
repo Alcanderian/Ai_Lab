@@ -8,16 +8,16 @@ import pickle
 import decision_tree
 import random_forest
 import random
-m = np.loadtxt('../../Data/train.csv', delimiter=',')
-perm = list(range(len(m)))
+ma = np.loadtxt('../../Data/train.csv', delimiter=',')
+perm = list(range(len(ma)))
 random.shuffle(perm)
 perm = np.array(perm)
 #mt = m[perm[range(int(len(perm) * 0.7))]]
 #mv = m[perm[range(int(len(perm) * 0.7), len(perm))]]
 mt = np.loadtxt('../../Data/magictrain.csv', delimiter=',')
 mv = np.loadtxt('../../Data/magicvalid.csv', delimiter=',')
-f = random_forest.train(mt, toolkit.multiple.cart, 6, 1024)
-t = decision_tree.train(mt, toolkit=toolkit.binary.discrete.cart)
+f = random_forest.train(ma, toolkit.multiple.cart, 6, 1024)
+t = decision_tree.train(ma, toolkit=toolkit.binary.discrete.cart)
 # validation
 print(random_forest.validation(f, mt))
 print(random_forest.validation(f, mv))
