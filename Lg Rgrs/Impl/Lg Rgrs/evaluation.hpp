@@ -1,10 +1,12 @@
 #pragma once
+
 #include <armadillo>
 #include <string>
 #include <map>
 
 using std::string;
 using std::map;
+
 using arma::vec;
 using arma::uvec;
 

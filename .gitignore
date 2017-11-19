@@ -266,3 +266,6 @@ __pycache__/
 
 # Result
 *result*.*
+
+# Armadillo
+*.arm

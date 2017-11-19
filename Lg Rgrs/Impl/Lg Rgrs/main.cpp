@@ -4,12 +4,18 @@
 using std::cout;
 using std::endl;
 
+void csv_to_binary(const string &prefix) {
+  mat t;
+  t.load("../../Data/" + prefix + "train.csv", arma::csv_ascii);
+  t.save("../../Data/" + prefix + "train.arm", arma::arma_binary);
+  t.load("../../Data/" + prefix + "test.csv", arma::csv_ascii);
+  t.save("../../Data/" + prefix + "test.arm", arma::arma_binary);
+}
+
 int main(int argc, const char **argv)
 {
-  srand((uint32_t)time(0));
-
   mat Xy;
-  Xy.load("../../Data/train.csv", arma::csv_ascii);
+  Xy.load("../../Data/train.arm", arma::arma_binary);
   auto tXy = Xy.rows(0, Xy.n_rows * 0.75 - 1);
   auto vXy = Xy.rows(Xy.n_rows * 0.75, Xy.n_rows - 1);
   auto vX = vXy.cols(0, vXy.n_cols - 2);
