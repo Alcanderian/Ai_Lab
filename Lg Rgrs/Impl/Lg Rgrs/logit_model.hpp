@@ -36,20 +36,20 @@ struct lr_config
   double lambda = 0.0;
   double eps = 0.0;
 
-  enum
+  enum rate
   {
     constant_rate = 0,
     error_rate,
     iteration_rate
   } learning_rate_t = constant_rate;
 
-  enum
+  enum descent
   {
     full_descent = 0,
     stochastic_descent
   } gradient_descent_t = full_descent;
 
-  enum
+  enum weight
   {
     ones_weight = 0,
     rand_weight
@@ -66,9 +66,7 @@ public:
   template<class T>
   static vec regression(const T &X, const vec &w)
   {
-    vec wX = arma::join_horiz(ones(X.n_rows), X) * w;
-
-    return __logistic(wX);
+    return __logistic(join_horiz(ones(X.n_rows), X) * w);
   }
 
   static vec classification(const mat &X, const vec &w,
@@ -84,31 +82,30 @@ public:
 
   void set_data(const mat &Xy)
   {
-    this->oXy = arma::join_horiz(ones(Xy.n_rows), Xy);
+    this->oXy = join_horiz(ones(Xy.n_rows), Xy);
   }
 
   vec train(const double &k)
   {
     vec last_w, w = __init[cfg.initial_weight_t](oXy.n_cols - 1);
-    double lrn_rate = cfg.alpha;
+    double rate = cfg.alpha;
     for (int i = 0; i < k; ++i)
     {
       /* choose subset */
-      subview<double> subset = __subset[cfg.gradient_descent_t](oXy);
-      subview<double> oX = subset(span::all, span(0, oXy.n_cols - 2));
-      subview<double> y = subset.col(oXy.n_cols - 1);
+      auto subset = __subset[cfg.gradient_descent_t](oXy);
+      auto oX = subset.cols(0, oXy.n_cols - 2);
+      auto y = subset.col(oXy.n_cols - 1);
 
       /* gradient descent */
-      vec wX = oX * w;
-      vec err = __logistic(wX) - y;
+      vec err = __logistic(oX * w) - y;
       vec gX = __gradient(err, oX, w, cfg);
       if (norm(gX) < cfg.eps)
         break;
 
       /* update w */
       last_w = w;
-      lrn_rate = __lrn_rate[cfg.learning_rate_t](err, lrn_rate, cfg);
-      w -= lrn_rate * gX;
+      rate = __lrn_rate[cfg.learning_rate_t](err, rate, cfg);
+      w -= rate * gX;
       if (norm(w - last_w) < cfg.eps)
         break;
     }
@@ -121,8 +118,7 @@ public:
 
 private:
   /* logistic function */
-  template<class T>
-  static T __logistic(const T &z) { return 1.0 / (1.0 + exp(-z)); }
+  static vec __logistic(const vec &z) { return 1.0 / (1.0 + exp(-z)); }
 
   /* gradient function */
   template<class T>
