@@ -13,15 +13,15 @@ using arma::subview;
 using arma::ones;
 using arma::randn;
 
-/* alpha: learning rate factor
+/* eta: learning rate factor
    lambda: regularization term factor
    eps: convergence factor
-   
+
    learning_rate_t:
-   - constant_rate: alpha
-   - error_rate: alpha * norm(err, 1) / N
-   - iteration_rate(init: alpha): last_rate / alpha
-   
+   - constant_rate: eta
+   - error_rate: eta * norm(err, 1) / N
+   - iteration_rate(init: eta): last_rate / eta
+
    gradient_descent_t:
    - full_descent
    - stochastic_descent
@@ -31,7 +31,7 @@ using arma::randn;
    - rand_weight */
 struct lr_config
 {
-  double alpha = 1.0;
+  double eta = 1.0;
   double lambda = 0.0;
   double eps = 0.0;
 
@@ -55,25 +55,28 @@ struct lr_config
   } initial_weight_t = ones_weight;
 };
 
-/* logistic regression class,
-   mat store by rows */
+/* logistic regression class, mat store by rows
+   why I use template functions?
+   : because X can be subview<>, mat or glue<>,
+   : to avoid deep copying, template function is better. */
 class lr_model
 {
 public:
   void set_cfg(const lr_config &cfg) { this->cfg = cfg; }
-  
+
+  /* [X y] -> [ones X y] */
   template<class M>
-  static vec regression(const M &X, const vec &w)
-  {
-    return __logistic(join_horiz(ones(X.n_rows), X) * w);
-  }
+  void set_data(const M &Xy) { this->oXy = join_horiz(ones(Xy.n_rows), Xy); }
+
+  template<class M>
+  static vec regression(const M &X, const vec &w) { return __logistic(join_horiz(ones(X.n_rows), X) * w); }
 
   template<class M>
   static vec classification(const M &X, const vec &w,
     const double &pos = 1.0, const double &neg = 0.0)
   {
     /* pX: porbility vec of X */
-    vec pX = regression(X, w);
+    vec &pX = regression(X, w);
     vec cX(pX.n_elem);
     cX.elem(find(pX > 0.5)).fill(pos);
     cX.elem(find(pX <= 0.5)).fill(neg);
@@ -81,39 +84,34 @@ public:
     return cX;
   }
 
-  /* [X y] -> [ones X y] */
-  template<class M>
-  void set_data(const M &Xy)
-  {
-    this->oXy = join_horiz(ones(Xy.n_rows), Xy);
-  }
-
   vec train(const double &k)
   {
-    vec last_w, w = __init[cfg.initial_weight_t](oXy.n_cols - 1);
-    double rate = cfg.alpha;
+    vec w = __init[cfg.initial_weight_t](oXy.n_cols - 1);
+    double eta = cfg.eta;
     for (int i = 0; i < k; ++i)
     {
       /* choose subset
          oX: [ones X] in MATLAB expresion */
       auto subset = __subset[cfg.gradient_descent_t](oXy, i);
-      auto oX = subset.cols(0, oXy.n_cols - 2);
-      auto y = subset.col(oXy.n_cols - 1);
-      
+      auto oX = subset.cols(0, subset.n_cols - 2);
+      auto y = subset.col(subset.n_cols - 1);
+
       /* gradient descent
          err: error vec
-         gX: gradient(C(w, X, y), w) */
+         gC: gradient(C(w, X, y), w) */
       vec err = __logistic(oX * w) - y;
-      vec &gX = __gradient(err, oX, w, cfg);
-      if (norm(gX) < cfg.eps)
+      vec &gC = __gradient(err, oX, w, cfg);
+      if (norm(gC) <= cfg.eps)
+        break;
+
+      /* learning rate * gradient */
+      eta = __lrn_rate[cfg.learning_rate_t](err, eta, cfg);
+      vec dC = eta * gC;
+      if (norm(dC) <= cfg.eps)
         break;
 
       /* update w */
-      last_w = w;
-      rate = __lrn_rate[cfg.learning_rate_t](err, rate, cfg);
-      w -= rate * gX;
-      if (norm(w - last_w) < cfg.eps)
-        break;
+      w -= dC;
     }
 
     return w;
@@ -127,17 +125,13 @@ private:
   /* logistic function */
   static vec __logistic(const vec &z) { return 1.0 / (1.0 + exp(-z)); }
 
-  /* gradient function
-     why I use template function?
-     : because X can be subview<>, mat or glue<>,
-     : to avoid deep copying, template function is better. */
+  /* gradient function */
   template<class M>
-  static vec __gradient(const vec &e, const M &X,
-    const vec &w, const lr_config &cfg)
+  static vec __gradient(const vec &e, const M &X, const vec &w, const lr_config &cfg)
   {
     /* regt: regularization term */
     double regt = (cfg.lambda == 0.0) ? 0.0 : cfg.lambda * sum(w);
-    
+
     return ((e.t() * X).t() + regt) / e.n_elem;
   }
 
@@ -145,21 +139,11 @@ private:
      0: constant learning rate
      1: error learning rate
      2: iteration learning rate */
-  function<double(const vec &, const double &, const lr_config &)>
-    __lrn_rate[3] =
+  function<double(const vec &, const double &, const lr_config &)> __lrn_rate[3] =
   {
-    [](const vec &e, const double &last_rate, const lr_config &cfg)
-    {
-      return cfg.alpha;
-    },
-    [](const vec &e, const double &last_rate, const lr_config &cfg)
-    {
-      return cfg.alpha * norm(e, 1) / e.n_elem;
-    },
-    [](const vec &e, const double &last_rate, const lr_config &cfg)
-    {
-      return last_rate / cfg.alpha;
-    }
+    [](const vec &e, const double &last_rate, const lr_config &cfg) { return cfg.eta; },
+    [](const vec &e, const double &last_rate, const lr_config &cfg) { return cfg.eta * norm(e, 1) / e.n_elem; },
+    [](const vec &e, const double &last_rate, const lr_config &cfg) { return last_rate / cfg.eta; }
   };
 
   /* subset functions
