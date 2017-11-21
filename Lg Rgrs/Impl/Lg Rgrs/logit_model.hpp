@@ -129,8 +129,12 @@ private:
   template<class M>
   static vec __gradient(const vec &e, const M &X, const vec &w, const lr_config &cfg)
   {
+    if (cfg.lambda == 0.0)
+      return (e.t() * X).t() / e.n_elem;
+
     /* regt: regularization term */
-    double regt = (cfg.lambda == 0.0) ? 0.0 : cfg.lambda * sum(w);
+    vec regt = cfg.lambda * w;
+    regt(0) = w(0);
 
     return ((e.t() * X).t() + regt) / e.n_elem;
   }

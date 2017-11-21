@@ -89,7 +89,11 @@
       <PreprocessorDefinitions>ARMA_USE_MKL_ALLOC;_SCL_SECURE_NO_WARNINGS;_UNICODE;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <LanguageStandard>stdcpplatest</LanguageStandard>
+      <BrowseInformation>true</BrowseInformation>
     </ClCompile>
+    <Bscmake>
+      <PreserveSbr>true</PreserveSbr>
+    </Bscmake>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>

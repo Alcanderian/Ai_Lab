@@ -26,7 +26,7 @@ int main(int argc, const char **argv)
   lr_config sgd =
   {
     0.001, // eta
-    0.001, // lambda
+    0.015, // lambda
     0.00001, // eps
     lr_config::rate::constant_rate,
     lr_config::descent::stochastic_descent,
@@ -35,13 +35,23 @@ int main(int argc, const char **argv)
 
   lr_config gd =
   {
-    0.01, // eta
-    600, // lambda
-    0.0001, // eps
+    0.2, // eta
+    800.0, // lambda
+    0.001, // eps
+    lr_config::rate::error_rate,
+    lr_config::descent::full_descent,
+    lr_config::weight::ones_weight
+  }; // iteration = 400
+
+  lr_config best =
+  {
+    0.1, // eta
+    0.0, // lambda
+    0.0, // eps
     lr_config::rate::constant_rate,
     lr_config::descent::full_descent,
     lr_config::weight::ones_weight
-  }; // iteration = 200
+  }; // iteration = 50000
 
   lr_config test =
   {
@@ -55,9 +65,9 @@ int main(int argc, const char **argv)
 
   lr_model lr;
   lr.set_data(tXy);
-  lr.set_cfg(test);
+  lr.set_cfg(sgd);
 
-  vec w = lr.train(20);
+  vec w = lr.train(60000);
   w.raw_print("w =");
   vec re = lr.classification(vX, w);
 
