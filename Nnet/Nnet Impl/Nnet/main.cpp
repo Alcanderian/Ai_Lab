@@ -12,5 +12,14 @@ int main(int argc, const char **argv)
 
   channel<nnet::base::activator> act(new nnet::activator::sigmoid);
   act().activation(v).print();
+
+  mat m = zeros(2, 2);
+  m.print();
+  subview_col<double> sv = m.col(0);
+  sv = v;
+  m.print();
+  m(0, 0) = 5;
+  m.print();
+  v.print();
   return 0;
 }

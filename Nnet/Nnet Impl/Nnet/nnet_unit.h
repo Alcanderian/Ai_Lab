@@ -8,7 +8,12 @@ namespace nnet
   class unit
   {
   public:
-    void bind(base::activator *act, vec &in, double &out, vec &weight, double &bias)
+    void bind(
+      base::activator *act, 
+      subview<double> &in, 
+      subview_col<double> &out,
+      subview_col<double> &weight,
+      subview_col<double> &bias)
     {
       this->act.bind(act);
       this->in.bind(in);
@@ -18,13 +23,13 @@ namespace nnet
     }
 
 
-    void run() { out() = dot(weight(), in()) + bias(); }
+    void run() { out() = act().activation((weight().t() * in()).t() + bias()); }
 
 
     channel<base::activator> act;
-    channel<vec> in;
-    channel<double> out;
-    channel<vec> weight;
-    channel<double> bias;
+    channel<subview<double>> in;
+    channel<subview_col<double>> out;
+    channel<subview_col<double>> weight;
+    channel<subview_col<double>> bias;
   };
 }

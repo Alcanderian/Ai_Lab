@@ -28,7 +28,7 @@ namespace nnet
       base::activator {
     public:
       vec activation(const vec &z) { return arma::tanh(z); }
-      vec derivation(const vec &z) { vec e = exp(2 * z); return (e - 1.0) / (e + 1.0); }
+      vec derivation(const vec &z) { vec e = exp(2.0 * z); return (e - 1.0) / (e + 1.0); }
     };
 
 
