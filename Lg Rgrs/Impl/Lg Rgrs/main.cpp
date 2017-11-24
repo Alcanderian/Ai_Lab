@@ -15,7 +15,8 @@ void csv_to_binary(const string &prefix) {
 int main(int argc, const char **argv)
 {
   mat Xy;
-  Xy.load("../../Data/train.arm");
+  Xy.load("../../Data/ystrain.txt");
+  Xy.print("train = ");
   auto X = Xy.cols(0, Xy.n_cols - 2);
   auto y = Xy.col(Xy.n_cols - 1);
   auto tXy = Xy.rows(0, Xy.n_rows * 0.75 - 1);
@@ -26,7 +27,7 @@ int main(int argc, const char **argv)
   lr_config sgd =
   {
     0.001, // eta
-    0.015, // lambda
+    0.008, // lambda
     0.00001, // eps
     lr_config::rate::constant_rate,
     lr_config::descent::stochastic_descent,
@@ -51,29 +52,29 @@ int main(int argc, const char **argv)
     lr_config::rate::constant_rate,
     lr_config::descent::full_descent,
     lr_config::weight::ones_weight
-  }; // iteration = 50000
+  }; // iteration = 20000
 
   lr_config test =
   {
-    1.0, // eta
+    5.0, // eta
     0.0, // lambda
     0.0, // eps
     lr_config::rate::constant_rate,
     lr_config::descent::full_descent,
-    lr_config::weight::ones_weight
+    lr_config::weight::zeros_weight
   };
 
   lr_model lr;
-  lr.set_data(tXy);
-  lr.set_cfg(sgd);
+  lr.set_data(Xy);
+  lr.set_cfg(test);
 
-  vec w = lr.train(60000);
-  w.raw_print("w =");
-  vec re = lr.classification(vX, w);
-
-  puts("\nevaluation:");
-  for (auto e : evaluation(vy, re))
-    cout << e.first << ":" << e.second << endl;
-
+  vec cost;
+  vec w = lr.train(1, cost);
+  w.print("w = ");
+  mat sX;
+  sX.load("../../Data/ystest.txt");
+  sX.print("test =");
+  vec re = lr.classification(sX.cols(0, sX.n_cols - 2), w);
+  re.print("result = ");
   return 0;
 }

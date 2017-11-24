@@ -11,6 +11,7 @@ using arma::datum;
 using arma::span;
 using arma::subview;
 using arma::ones;
+using arma::zeros;
 using arma::randn;
 
 /* eta: learning rate factor
@@ -51,7 +52,8 @@ struct lr_config
   enum weight
   {
     ones_weight = 0,
-    rand_weight
+    rand_weight,
+    zeros_weight
   } initial_weight_t = ones_weight;
 };
 
@@ -84,10 +86,11 @@ public:
     return cX;
   }
 
-  vec train(const double &k)
+  vec train(const double &k, vec &cost)
   {
     vec w = __init[cfg.initial_weight_t](oXy.n_cols - 1);
     double eta = cfg.eta;
+    cost = zeros(k);
     for (int i = 0; i < k; ++i)
     {
       /* choose subset
@@ -112,6 +115,11 @@ public:
 
       /* update w */
       w -= dC;
+
+      /* new cost */
+      cost(i) = __cost(y, oX, w, cfg);
+      if (i > 0 && abs(cost(i) - cost(i - 1)) < cfg.eps)
+        break;
     }
 
     return w;
@@ -134,10 +142,27 @@ private:
 
     /* regt: regularization term */
     vec regt = cfg.lambda * w;
-    regt(0) = w(0);
+    regt(0) = 0.0;
 
     return ((e.t() * X).t() + regt) / e.n_elem;
   }
+
+  /* cost function */
+  template<class M>
+  static double __cost(const vec &y, const M &X, const vec &w, const lr_config &cfg)
+  {
+    vec wX = X * w;
+    auto log_prob = (y % wX) - log(1 + exp(wX));
+    if (cfg.lambda == 0.0)
+      return -sum(log_prob) / X.n_rows;
+
+    /* regt: regularization term */
+    vec regt = w;
+    regt(0) = 0.0;
+
+    return -(sum(log_prob) + 0.5 * cfg.lambda * dot(regt, regt)) / X.n_rows;
+  }
+
 
   /* learning rate functions
      0: constant learning rate
@@ -162,9 +187,10 @@ private:
   /* initialize functions
      0: ones
      1: rand */
-  function<vec(const int &)> __init[2] =
+  function<vec(const int &)> __init[3] =
   {
     [](const int &n) { return ones(n); },
-    [](const int &n) { return randn(n); }
+    [](const int &n) { return randn(n); },
+    [](const int &n) { return zeros(n); }
   };
 };
