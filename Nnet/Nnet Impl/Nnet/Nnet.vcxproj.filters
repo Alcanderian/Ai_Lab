@@ -13,6 +13,9 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Header Files\nnet">
+      <UniqueIdentifier>{9a367fd5-d217-4b30-aea7-3cbc58a1f814}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -21,31 +24,22 @@
     <ClCompile Include="stdafx.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="nnet_layer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="nnet.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="nnet_unit.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="nnet_nnet.h">
+      <Filter>Header Files\nnet</Filter>
+    </ClInclude>
+    <ClInclude Include="nnet_activation.h">
+      <Filter>Header Files\nnet</Filter>
     </ClInclude>
     <ClInclude Include="nnet_layer.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\nnet</Filter>
     </ClInclude>
-    <ClInclude Include="nnet.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="nnet_activator.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="channel.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="nnet_loss.h">
+      <Filter>Header Files\nnet</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

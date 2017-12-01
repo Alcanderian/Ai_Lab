@@ -1,0 +1,43 @@
+#pragma once
+#include "stdafx.h"
+
+
+namespace nnet
+{
+    class activation {
+    public:
+      // propagate(activation) function
+      virtual mat propagate(const mat &z) = 0;
+      // back_propagate(derivation) of activation function
+      virtual mat back_propagate(const mat &z) = 0;
+    };
+
+    class sigmoid :
+      public activation {
+    public:
+      mat propagate(const mat &z) { return 1.0 / (1.0 + exp(-z)); }
+      mat back_propagate(const mat &z) { mat &s = propagate(z); return s % (1.0 - s); }
+    };
+
+
+    class tanh :
+      public activation {
+    public:
+      mat propagate(const mat &z) { return arma::tanh(z); }
+      mat back_propagate(const mat &z) { mat t = arma::tanh(z); return 1 - pow(t, 2); }
+    };
+
+
+    class para_relu :
+      public activation {
+    public:
+      double beta;
+      para_relu(const double &beta = 0.0) :
+        beta(beta)
+      { }
+
+
+      mat propagate(const mat &z) { mat r = z; r.elem(find(r < 0.0)) *= beta; return r; }
+      mat back_propagate(const mat &z) { mat r = ones(z.n_rows, z.n_cols); r.elem(find(z < 0.0)).fill(beta); return r; }
+    };
+}

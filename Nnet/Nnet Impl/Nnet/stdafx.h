@@ -2,17 +2,11 @@
 #include <armadillo>
 #include <iostream>
 #include <string>
-#include <functional>
+#include <cassert>
 
-
-using std::cout;
-using std::cin;
-using std::endl;
-using std::function;
 
 using arma::mat;
 using arma::vec;
-using arma::subview;
-using arma::subview_col;
+using arma::uvec;
+using arma::field;
 using arma::ones;
-using arma::zeros;
