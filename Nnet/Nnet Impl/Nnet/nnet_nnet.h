@@ -10,9 +10,9 @@ namespace nnet
   {
   public:
     field<layer> layers;
-    field<mat> conns;
+    field<mat> ios;
     field<mat> weights;
-    field<mat> bufs;
+    field<mat> muls;
     field<mat> dlosses;
     field<mat> deltas;
     field<mat> biases;
@@ -22,34 +22,31 @@ namespace nnet
     int n_layers = 0;
 
 
-    ~nnet() { if (los != NULL) delete[] los; }
-
-
-    // conns: layer-connections of nnet, if n_layers = N, then n_conns = N + 1
+    // ios: layer-io of nnet, if n_layers = N, then n_ios = N + 1
     // layers: not include input-layer
-    void init_malloc(const uvec &conns_dim)
+    void init_malloc(const uvec &ios_dim)
     {
-      n_layers = conns_dim.n_elem - 1;
+      n_layers = ios_dim.n_elem - 1;
       layers.set_size(n_layers);
-      conns.set_size(conns_dim.n_elem);
+      ios.set_size(ios_dim.n_elem);
       weights.set_size(n_layers);
-      bufs.set_size(n_layers);
-      dlosses.set_size(conns_dim.n_elem);
+      muls.set_size(n_layers);
+      dlosses.set_size(ios_dim.n_elem);
       deltas.set_size(n_layers);
       alphas.set_size(n_layers);
       lambdas.set_size(n_layers);
       biases.set_size(n_layers);
 
       int i = 0;
-      weights.for_each([&i, &conns_dim](mat &m) { m.set_size(conns_dim(i + 1), conns_dim(i)); ++i; });
+      weights.for_each([&i, &ios_dim](mat &m) { m.set_size(ios_dim(i + 1), ios_dim(i)); ++i; });
       i = 0;
-      biases.for_each([&i, &conns_dim](mat &m) { m.set_size(conns_dim(i + 1), 1); ++i; });
+      biases.for_each([&i, &ios_dim](mat &m) { m.set_size(ios_dim(i + 1), 1); ++i; });
       i = 0;
-      alphas.for_each([&i, &conns_dim](mat &m) { m.set_size(conns_dim(i + 1), 1); ++i; });
+      alphas.for_each([&i, &ios_dim](mat &m) { m.set_size(ios_dim(i + 1), 1); ++i; });
       i = 0;
-      lambdas.for_each([&i, &conns_dim](mat &m) { m.set_size(conns_dim(i + 1), 1); ++i; });
+      lambdas.for_each([&i, &ios_dim](mat &m) { m.set_size(ios_dim(i + 1), 1); ++i; });
       i = 0;
-      layers.for_each([&i, &conns_dim](layer &l) { l.init_malloc(conns_dim(i + i)); ++i; });
+      layers.for_each([&i, &ios_dim](layer &l) { l.init_malloc(ios_dim(i + i)); ++i; });
     }
 
 
@@ -57,7 +54,11 @@ namespace nnet
     {
       assert(los != NULL);
 
-      conns(0) = x;
+      int len = x.n_cols;
+
+      // init ios(0), first input
+      ios(0) = x;
+
       if (losses != NULL)
         losses->set_size(n_iterations);
 
@@ -66,25 +67,25 @@ namespace nnet
         // propagate
         for (int l = 0; l < n_layers; ++l)
           layers(l).propagate(
-            conns(l),
+            ios(l),
             weights(l),
             biases(l),
-            &bufs(l),
-            &conns(l + 1)
+            &muls(l),
+            &ios(l + 1)
           );
 
-        // k-th iteration's loss
+        // k-th iteration's avg-loss
         if (losses != NULL)
-          losses->at(k) = los->eval(conns(n_layers), y);
+          losses->at(k) = los->avg_eval(ios(n_layers), y);
 
-        // dloss
-        dlosses(n_layers) = los->diff(conns(n_layers), y);
+        // dloss(l + 1)
+        dlosses(n_layers) = los->diff(ios(n_layers), y);
 
         // back propagate
         for (int l = n_layers - 1; l >= 0; --l)
           layers(l).back_propagate(
-            conns(l),
-            bufs(l),
+            ios(l),
+            muls(l),
             dlosses(l + 1),
             alphas(l),
             lambdas(l),

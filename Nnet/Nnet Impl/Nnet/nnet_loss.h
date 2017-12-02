@@ -8,7 +8,7 @@ namespace nnet
   {
   public:
     /* loss function */
-    virtual mat eval(const mat &t, const mat &y) = 0;
+    virtual mat avg_eval(const mat &t, const mat &y) = 0;
     /* diff of loss function */
     virtual mat diff(const mat &t, const mat &y) = 0;
   };
@@ -18,9 +18,11 @@ namespace nnet
     public loss
   {
   public:
-    mat eval(const mat &t, const mat &y)
+    mat avg_eval(const mat &t, const mat &y)
     {
-      return 0.5 * pow(y - t, 2);
+      int len = y.n_cols;
+
+      return 0.5 * pow(y - t, 2) * ones(1, len).t() / len;
     }
 
 

@@ -15,7 +15,9 @@ namespace nnet
     class sigmoid :
       public activation {
     public:
+      // 1 / (1 + e^z)
       mat propagate(const mat &z) { return 1.0 / (1.0 + exp(-z)); }
+      // s / (1 - s)
       mat back_propagate(const mat &z) { mat &s = propagate(z); return s % (1.0 - s); }
     };
 
@@ -23,7 +25,9 @@ namespace nnet
     class tanh :
       public activation {
     public:
+      // (e^z - e^(-z)) / (e^z + e^(-z)),
       mat propagate(const mat &z) { return arma::tanh(z); }
+      // 1 - t^2
       mat back_propagate(const mat &z) { mat t = arma::tanh(z); return 1 - pow(t, 2); }
     };
 
