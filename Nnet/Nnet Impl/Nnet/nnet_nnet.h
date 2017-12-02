@@ -18,7 +18,7 @@ namespace nnet
     field<mat> biases;
     field<mat> alphas;
     field<mat> lambdas;
-    loss *los = NULL;
+    field<loss*> loss_itf;
     int n_layers = 0;
 
 
@@ -36,7 +36,9 @@ namespace nnet
       alphas.set_size(n_layers);
       lambdas.set_size(n_layers);
       biases.set_size(n_layers);
+      loss_itf.set_size(ios_dim(ios_dim.n_elem - 1));
 
+      loss_itf.fill(NULL);
       int i = 0;
       weights.for_each(
         [&i, &ios_dim](mat &m) { m.set_size(ios_dim(i + 1), ios_dim(i)); ++i; }
@@ -57,9 +59,11 @@ namespace nnet
 
     void train(const mat& x, const mat& y, const int &n_iterations, field<mat> *losses)
     {
-      assert(los != NULL);
+      loss_itf.for_each(
+        [](loss* &f) { assert(f != NULL); }
+      );
 
-      int len = x.n_cols;
+      int len = y.n_cols, out_dim = y.n_rows;
 
       // init ios(0), first input
       ios(0) = x;
@@ -80,11 +84,21 @@ namespace nnet
           );
 
         // k-th iteration's avg-loss
-        if (losses != NULL)
-          losses->at(k) = los->avg_eval(ios(n_layers), y);
+        int i = 0;
+        if (losses != NULL) {
+          losses->at(k).set_size(out_dim, 1);
+          losses->at(k).each_row(
+            [&i, this, &y](mat &r) { r = this->loss_itf(i)->avg_eval(this->ios(this->n_layers).row(i), y.row(i)); ++i; }
+          );
+        }
 
         // dloss(l + 1)
-        dlosses(n_layers) = los->diff(ios(n_layers), y);
+        i = 0;
+        if (dlosses(n_layers).n_rows != y.n_rows || dlosses(n_layers).n_cols != y.n_cols)
+          dlosses(n_layers).set_size(y.n_rows, y.n_cols);
+        dlosses(n_layers).each_row(
+          [&i, this, &y](mat &r) { r = this->loss_itf(i)->diff(this->ios(this->n_layers).row(i), y.row(i)); ++i; }
+        );
 
         // back propagate
         for (int l = n_layers - 1; l >= 0; --l)

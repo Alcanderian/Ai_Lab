@@ -28,7 +28,7 @@ namespace nnet
       // (e^z - e^(-z)) / (e^z + e^(-z)),
       mat propagate(const mat &z) { return arma::tanh(z); }
       // 1 - t^2
-      mat back_propagate(const mat &z) { mat t = arma::tanh(z); return 1 - pow(t, 2); }
+      mat back_propagate(const mat &z) { mat t = arma::tanh(z); return 1 - square(t); }
     };
 
 

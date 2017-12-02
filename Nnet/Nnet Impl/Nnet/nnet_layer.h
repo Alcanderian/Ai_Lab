@@ -21,7 +21,7 @@ namespace nnet
       mat *mul,
       mat *out)
     {
-      int i = 0, len = in.n_cols;
+      int len = in.n_cols;
 
       // z = wa + b
       *mul = weight * in + repmat(bias, 1, len);
@@ -29,6 +29,7 @@ namespace nnet
       // f(z)
       if (out->n_rows != mul->n_rows || out->n_cols != mul->n_cols)
         out->set_size(mul->n_rows, mul->n_cols);
+      int i = 0;
       out->each_row(
         [&i, this, mul](mat &r) { assert(this->acts(i) != NULL); r = this->acts(i)->propagate(mul->row(i)); ++i; }
       );
@@ -47,11 +48,12 @@ namespace nnet
       mat *bias
     )
     {
-      int i = 0, len = in.n_cols, in_dim = in.n_rows;
+      int len = in.n_cols, in_dim = in.n_rows;
 
       // f'(z)
       if (delta->n_rows != mul.n_rows || delta->n_cols != mul.n_cols)
         delta->set_size(mul.n_rows, mul.n_cols);
+      int i = 0;
       delta->each_row(
         [&i, this, &mul, &out_dloss](mat &r) { assert(this->acts(i) != NULL); r = this->acts(i)->back_propagate(mul.row(i)); ++i; }
       );
@@ -63,7 +65,7 @@ namespace nnet
       *in_dloss = weight->t() * *delta;
 
       // w = (1 - lambda) .* w - alpha .* (theta * in.t()) / len
-      *weight = (1 - repmat(lambda, 1, in_dim)) % *weight - repmat(alpha, 1, in_dim) % (*delta * in.t()) / len;
+      *weight = (1.0 - repmat(lambda, 1, in_dim)) % *weight - repmat(alpha, 1, in_dim) % (*delta * in.t()) / len;
 
       // b = b - alpha .* mean_of_rows(delta)
       *bias = *bias - alpha % mean(*delta, 1);
