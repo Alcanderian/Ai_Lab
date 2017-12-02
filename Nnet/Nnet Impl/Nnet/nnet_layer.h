@@ -30,7 +30,8 @@ namespace nnet
       if (out->n_rows != mul->n_rows || out->n_cols != mul->n_cols)
         out->set_size(mul->n_rows, mul->n_cols);
       out->each_row(
-        [&i, this, mul](mat &r) { assert(this->acts(i) != NULL); r = this->acts(i)->propagate(mul->row(i)); ++i; });
+        [&i, this, mul](mat &r) { assert(this->acts(i) != NULL); r = this->acts(i)->propagate(mul->row(i)); ++i; }
+      );
     }
 
 
@@ -51,7 +52,9 @@ namespace nnet
       // f'(z)
       if (delta->n_rows != mul.n_rows || delta->n_cols != mul.n_cols)
         delta->set_size(mul.n_rows, mul.n_cols);
-      delta->each_row([&i, this, &mul, &out_dloss](mat &r) { assert(this->acts(i) != NULL); r = this->acts(i)->back_propagate(mul.row(i)); ++i; });
+      delta->each_row(
+        [&i, this, &mul, &out_dloss](mat &r) { assert(this->acts(i) != NULL); r = this->acts(i)->back_propagate(mul.row(i)); ++i; }
+      );
 
       // delta = loss'(f(z)) .* f'(z)
       *delta = out_dloss % *delta;
@@ -62,8 +65,8 @@ namespace nnet
       // w = (1 - lambda) .* w - alpha .* (theta * in.t()) / len
       *weight = (1 - repmat(lambda, 1, in_dim)) % *weight - repmat(alpha, 1, in_dim) % (*delta * in.t()) / len;
 
-      // b = b - alpha .* (theta * ones.t()) / len
-      *bias = *bias - alpha % (*delta * ones(1, len).t()) / len;
+      // b = b - alpha .* mean_of_rows(delta)
+      *bias = *bias - alpha % mean(*delta, 1);
     }
   };
 }

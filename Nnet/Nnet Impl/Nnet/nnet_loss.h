@@ -20,9 +20,8 @@ namespace nnet
   public:
     mat avg_eval(const mat &t, const mat &y)
     {
-      int len = y.n_cols;
-
-      return 0.5 * pow(y - t, 2) * ones(1, len).t() / len;
+      // mean half-square-error
+      return mean(0.5 * square(y - t), 1);
     }
 
 

@@ -38,15 +38,20 @@ namespace nnet
       biases.set_size(n_layers);
 
       int i = 0;
-      weights.for_each([&i, &ios_dim](mat &m) { m.set_size(ios_dim(i + 1), ios_dim(i)); ++i; });
+      weights.for_each(
+        [&i, &ios_dim](mat &m) { m.set_size(ios_dim(i + 1), ios_dim(i)); ++i; }
+      );
+      auto mat_malloc = [&i, &ios_dim](mat &m) { m.set_size(ios_dim(i + 1), 1); ++i; };
       i = 0;
-      biases.for_each([&i, &ios_dim](mat &m) { m.set_size(ios_dim(i + 1), 1); ++i; });
+      biases.for_each(mat_malloc);
       i = 0;
-      alphas.for_each([&i, &ios_dim](mat &m) { m.set_size(ios_dim(i + 1), 1); ++i; });
+      alphas.for_each(mat_malloc);
       i = 0;
-      lambdas.for_each([&i, &ios_dim](mat &m) { m.set_size(ios_dim(i + 1), 1); ++i; });
+      lambdas.for_each(mat_malloc);
       i = 0;
-      layers.for_each([&i, &ios_dim](layer &l) { l.init_malloc(ios_dim(i + i)); ++i; });
+      layers.for_each(
+        [&i, &ios_dim](layer &l) { l.init_malloc(ios_dim(i + i)); ++i; }
+      );
     }
 
 
