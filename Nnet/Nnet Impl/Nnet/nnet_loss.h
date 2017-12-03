@@ -8,9 +8,9 @@ namespace nnet
   {
   public:
     /* loss function */
-    virtual mat avg_eval(const mat &t, const mat &y) = 0;
+    virtual void avg_eval(const mat &t, const mat &y, mat *e) = 0;
     /* diff of loss function */
-    virtual mat diff(const mat &t, const mat &y) = 0;
+    virtual void diff(const mat &t, const mat &y, mat *d) = 0;
   };
 
 
@@ -18,16 +18,16 @@ namespace nnet
     public loss
   {
   public:
-    mat avg_eval(const mat &t, const mat &y)
+    void avg_eval(const mat &t, const mat &y, mat *e)
     {
       // mean half-square-error
-      return mean(0.5 * square(y - t), 1);
+      *e = mean(0.5 * square(y - t), 1);
     }
 
 
-    mat diff(const mat &t, const mat &y)
+    void diff(const mat &t, const mat &y, mat *d)
     {
-      return t - y;
+      *d = t - y;
     }
   };
 
@@ -35,16 +35,16 @@ namespace nnet
     public loss
   {
   public:
-    mat avg_eval(const mat &t, const mat &y)
+    void avg_eval(const mat &t, const mat &y, mat *e)
     {
       // mean xent, -1 / n * sum_of_rows(y .* ln(t) + (1 - y) .* ln(1 - t))
-      return -mean(y % log(t) + (1.0 - y) % log(1.0 - t), 1);
+      *e = -mean(y % log(t) + (1.0 - y) % log(1.0 - t), 1);
     }
 
 
-    mat diff(const mat &t, const mat &y)
+    void diff(const mat &t, const mat &y, mat *d)
     {
-      return (t - y) / (t % (1 - t));
+      *d = (t - y) / (t % (1 - t));
     }
   };
 }

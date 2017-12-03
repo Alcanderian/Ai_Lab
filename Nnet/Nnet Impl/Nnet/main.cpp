@@ -51,15 +51,15 @@ int main(int argc, const char **argv)
 
   mat tlosses;
   mat vlosses;
-  int n_iterations = 10000; // 10000, 3000
+  int n_iterations = 15933; // 10000, 3000, 15933
   nn.train(
-    tx,
-    ty,
+    x,
+    y,
     n_iterations,
-    &tlosses,
-    &vx,
-    &vy,
-    &vlosses
+    &tlosses // ,
+    // &vx,
+    // &vy,
+    // &vlosses
   );
   // nn.ios.print("ios=");
   // nn.muls.print("muls=");
@@ -67,12 +67,16 @@ int main(int argc, const char **argv)
   // nn.weights.print("weights=");
   // nn.biases.print("biases=");
   tlosses.save("../../Data/tlosses.csv", arma::csv_ascii);
-  vlosses.save("../../Data/vlosses.csv", arma::csv_ascii);
-  nn.propagate(vx);
-  mat ry = nn.output();
-  mat(ry.t()).save("../../Data/predict.csv", arma::csv_ascii);
-  mat(vy.t()).save("../../Data/actual.csv", arma::csv_ascii);
-  cor(ry, vy).print("corr =");
+  // vlosses.save("../../Data/vlosses.csv", arma::csv_ascii);
+  xy.load("../../Data/test.csv");
+  mat sx = xy.cols(0, xy.n_cols - 2).t();
+  nn.propagate(sx);
+  mat(nn.output().t()).save("../../Data/result.csv", arma::csv_ascii);
+  // nn.propagate(vx);
+  // mat ry = nn.output();
+  // mat(ry.t()).save("../../Data/predict.csv", arma::csv_ascii);
+  // mat(vy.t()).save("../../Data/actual.csv", arma::csv_ascii);
+  // cor(ry, vy).print("corr =");
 
   return 0;
 }

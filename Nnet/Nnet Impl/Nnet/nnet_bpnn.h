@@ -12,7 +12,6 @@ namespace nnet
     field<layer> layers;
     field<mat> ios;
     field<mat> weights;
-    field<mat> muls;
     field<mat> dlosses;
     field<mat> deltas;
     field<mat> biases;
@@ -33,13 +32,14 @@ namespace nnet
       layers.set_size(n_layers);
       ios.set_size(ios_dim.n_elem);
       weights.set_size(n_layers);
-      muls.set_size(n_layers);
       dlosses.set_size(ios_dim.n_elem);
       deltas.set_size(n_layers);
       alphas.set_size(n_layers);
       lambdas.set_size(n_layers);
       biases.set_size(n_layers);
       loss_itfs.set_size(ios_dim(ios_dim.n_elem - 1));
+      weight_gradients.set_size(n_layers);
+      bias_gradients.set_size(n_layers);
 
       loss_itfs.fill(NULL);
       int i = 0;
@@ -96,7 +96,7 @@ namespace nnet
         if (tlosses != NULL)
         {
           tlosses->row(k - 1).each_col(
-            [&i, this, &ty](mat &r) { r = this->loss_itfs(i)->avg_eval(this->ios(this->n_layers).row(i), ty.row(i)); ++i; }
+            [&i, this, &ty](mat &r) { this->loss_itfs(i)->avg_eval(this->ios(this->n_layers).row(i), ty.row(i), &r); ++i; }
           );
         }
 
@@ -105,7 +105,7 @@ namespace nnet
         if (dlosses(n_layers).n_rows != ty.n_rows || dlosses(n_layers).n_cols != ty.n_cols)
           dlosses(n_layers).set_size(ty.n_rows, ty.n_cols);
         dlosses(n_layers).each_row(
-          [&i, this, &ty](mat &r) { r = this->loss_itfs(i)->diff(this->ios(this->n_layers).row(i), ty.row(i)); ++i; }
+          [&i, this, &ty](mat &r) { this->loss_itfs(i)->diff(this->ios(this->n_layers).row(i), ty.row(i), &r); ++i; }
         );
 
         // back propagate
@@ -117,10 +117,13 @@ namespace nnet
         {
           propagate(*vx);
           vlosses->row(k - 1).each_col(
-            [&i, this, vy](mat &r) { r = this->loss_itfs(i)->avg_eval(this->ios(this->n_layers).row(i), vy->row(i)); ++i; }
+            [&i, this, vy](mat &r) { this->loss_itfs(i)->avg_eval(this->ios(this->n_layers).row(i), vy->row(i), &r); ++i; }
           );
         }
       }
+
+      std::cout << "100 %" << std::endl;
+      std::cout << n_iterations << " / " << n_iterations << std::endl;
     }
 
 
@@ -135,25 +138,29 @@ namespace nnet
           ios(l),
           weights(l),
           biases(l),
-          &muls(l),
           &ios(l + 1)
         );
     }
 
 
   private:
+    field<mat> weight_gradients;
+    field<mat> bias_gradients;
+
     void back_propagate(const int &k)
     {
       for (int l = n_layers - 1; l >= 0; --l)
         layers(l).back_propagate(
           ios(l),
-          muls(l),
+          ios(l + 1),
           dlosses(l + 1),
           alphas(l),
           lambdas(l),
           k,
           &dlosses(l),
           &deltas(l),
+          &weight_gradients(l),
+          &bias_gradients(l),
           &weights(l),
           &biases(l)
         );

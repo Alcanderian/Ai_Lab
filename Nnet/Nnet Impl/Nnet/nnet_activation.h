@@ -8,9 +8,9 @@ namespace nnet
     {
     public:
       // propagate(activation) function
-      virtual mat propagate(const mat &z) = 0;
+      virtual void propagate(const mat &z, mat *y) = 0;
       // back_propagate(derivation) of activation function
-      virtual mat back_propagate(const mat &z) = 0;
+      virtual void back_propagate(const mat &z, mat *y) = 0;
     };
 
 
@@ -19,9 +19,9 @@ namespace nnet
     {
     public:
       // 1 / (1 + e^z)
-      mat propagate(const mat &z) { return 1.0 / (1.0 + exp(-z)); }
-      // s / (1 - s)
-      mat back_propagate(const mat &z) { mat &s = propagate(z); return s % (1.0 - s); }
+      void propagate(const mat &z, mat *y) { *y =  1.0 / (1.0 + exp(-z)); }
+      // z / (1 - z)
+      void back_propagate(const mat &z, mat *y) { *y = z % (1.0 - z); }
     };
 
 
@@ -30,9 +30,9 @@ namespace nnet
     {
     public:
       // (e^z - e^(-z)) / (e^z + e^(-z)),
-      mat propagate(const mat &z) { return arma::tanh(z); }
-      // 1 - t^2
-      mat back_propagate(const mat &z) { mat t = arma::tanh(z); return 1 - square(t); }
+      void propagate(const mat &z, mat *y) { *y =  arma::tanh(z); }
+      // 1 - z^2
+      void back_propagate(const mat &z, mat *y) { *y =  1.0 - square(z); }
     };
 
 
@@ -46,8 +46,8 @@ namespace nnet
       { }
 
 
-      mat propagate(const mat &z) { mat r = z; r.elem(find(r < 0.0)) *= beta; return r; }
-      mat back_propagate(const mat &z) { mat r = ones(z.n_rows, z.n_cols); r.elem(find(z < 0.0)).fill(beta); return r; }
+      void propagate(const mat &z, mat *y) { assert(beta >= 0.0); *y = z; y->elem(find(*y < 0.0)) *= beta; }
+      void back_propagate(const mat &z, mat *y) { *y = ones(z.n_rows, z.n_cols); y->elem(find(z < 0.0)).fill(beta); }
     };
 
 
@@ -55,7 +55,7 @@ namespace nnet
       public activation
     {
     public:
-      mat propagate(const mat &z) { return z; }
-      mat back_propagate(const mat &z) { return ones(z.n_rows, z.n_cols); }
+      void propagate(const mat &z, mat *y) { *y = z; }
+      void back_propagate(const mat &z, mat *y) { *y = ones(z.n_rows, z.n_cols); }
     };
 }
