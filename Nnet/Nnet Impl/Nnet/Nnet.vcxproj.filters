@@ -29,9 +29,6 @@
     <ClInclude Include="stdafx.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="nnet_nnet.h">
-      <Filter>Header Files\nnet</Filter>
-    </ClInclude>
     <ClInclude Include="nnet_activation.h">
       <Filter>Header Files\nnet</Filter>
     </ClInclude>
@@ -39,6 +36,12 @@
       <Filter>Header Files\nnet</Filter>
     </ClInclude>
     <ClInclude Include="nnet_loss.h">
+      <Filter>Header Files\nnet</Filter>
+    </ClInclude>
+    <ClInclude Include="nnet_optimizer.h">
+      <Filter>Header Files\nnet</Filter>
+    </ClInclude>
+    <ClInclude Include="nnet_bpnn.h">
       <Filter>Header Files\nnet</Filter>
     </ClInclude>
   </ItemGroup>

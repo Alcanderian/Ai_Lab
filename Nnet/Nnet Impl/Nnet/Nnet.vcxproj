@@ -134,9 +134,10 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="nnet_loss.h" />
-    <ClInclude Include="nnet_nnet.h" />
+    <ClInclude Include="nnet_bpnn.h" />
     <ClInclude Include="nnet_layer.h" />
     <ClInclude Include="nnet_activation.h" />
+    <ClInclude Include="nnet_optimizer.h" />
     <ClInclude Include="stdafx.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

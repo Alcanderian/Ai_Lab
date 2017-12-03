@@ -1,6 +1,7 @@
 #pragma once
 #include "stdafx.h"
 #include "nnet_activation.h"
+#include "nnet_optimizer.h"
 
 
 namespace nnet
@@ -9,7 +10,8 @@ namespace nnet
   {
   public:
     field<activation*> acts;
-
+    optimizer* weight_opt = NULL;
+    optimizer* bias_opt = NULL;
 
     void init_malloc(const int &out_dim) { acts.set_size(out_dim); acts.fill(NULL); }
 
@@ -42,12 +44,16 @@ namespace nnet
       const mat &out_dloss,
       const mat &alpha,
       const mat &lambda,
+      const double &k,
       mat *in_dloss,
       mat *delta,
       mat *weight,
       mat *bias
     )
     {
+      assert(weight_opt != NULL);
+      assert(bias_opt != NULL);
+
       int len = in.n_cols, in_dim = in.n_rows;
 
       // f'(z)
@@ -64,11 +70,11 @@ namespace nnet
       // prev_dloss = w.t() * theta
       *in_dloss = weight->t() * *delta;
 
-      // w = (1 - lambda) .* w - alpha .* (theta * in.t()) / len
-      *weight = (1.0 - repmat(lambda, 1, in_dim)) % *weight - repmat(alpha, 1, in_dim) % (*delta * in.t()) / len;
+      // w =  w - alpha .* (opt((theta * in.t()) / len) + lambda .* w)
+      *weight = *weight - repmat(alpha, 1, in_dim) % weight_opt->optimize((*delta * in.t()) / len + repmat(lambda, 1, in_dim) % *weight, k);
 
-      // b = b - alpha .* mean_of_rows(delta)
-      *bias = *bias - alpha % mean(*delta, 1);
+      // b = b - alpha .* opt(mean_of_rows(delta))
+      *bias = *bias - alpha % bias_opt->optimize(mean(*delta, 1), k);
     }
   };
 }

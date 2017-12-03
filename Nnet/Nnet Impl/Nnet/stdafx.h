@@ -10,3 +10,4 @@ using arma::vec;
 using arma::uvec;
 using arma::field;
 using arma::ones;
+using arma::zeros;
