@@ -29,8 +29,6 @@ namespace nnet
       *mul = weight * in + repmat(bias, 1, len);
 
       // f(z)
-      if (out->n_rows != mul->n_rows || out->n_cols != mul->n_cols)
-        out->set_size(mul->n_rows, mul->n_cols);
       *out = act->propagate(*mul);
     }
 
@@ -55,17 +53,15 @@ namespace nnet
       int len = in.n_cols, in_dim = in.n_rows;
 
       // f'(z)
-      if (delta->n_rows != mul.n_rows || delta->n_cols != mul.n_cols)
-        delta->set_size(mul.n_rows, mul.n_cols);
       *delta = act->back_propagate(mul);
 
       // delta = loss'(f(z)) .* f'(z)
       *delta = out_dloss % *delta;
 
-      // prev_dloss = w.t() * theta
+      // prev_dloss = w.t() * delta
       *in_dloss = weight->t() * *delta;
 
-      // w =  w - alpha .* (opt((theta * in.t()) / len) + lambda .* w)
+      // w =  w - alpha .* opt((delta * in.t()) / len + lambda .* w)
       *weight = *weight - repmat(alpha, 1, in_dim) % weight_opt->optimize((*delta * in.t()) / len + repmat(lambda, 1, in_dim) % *weight, k);
 
       // b = b - alpha .* opt(mean_of_rows(delta))
