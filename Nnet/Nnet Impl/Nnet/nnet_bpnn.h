@@ -76,6 +76,7 @@ namespace nnet
       if (vx != NULL && vy != NULL && vlosses != NULL)
         vlosses->set_size(n_iterations, out_dim);
 
+      system("cls");
       std::cout << "0 %" << std::endl;
       std::cout << "0 / " << n_iterations << std::endl;
 
@@ -122,6 +123,7 @@ namespace nnet
         }
       }
 
+      system("cls");
       std::cout << "100 %" << std::endl;
       std::cout << n_iterations << " / " << n_iterations << std::endl;
     }

@@ -71,7 +71,10 @@ int main(int argc, const char **argv)
   xy.load("../../Data/test.csv");
   mat sx = xy.cols(0, xy.n_cols - 2).t();
   nn.propagate(sx);
-  mat(nn.output().t()).save("../../Data/result.csv", arma::csv_ascii);
+  arma::imat sy = zeros<arma::imat>(nn.output().n_rows, nn.output().n_cols);
+  int i = 0;
+  sy.for_each([&i, &nn](int64_t &e) { if (nn.output()(i) >= 0.0) { e = nn.output()(i); } ++i; });
+  arma::imat(sy.t()).save("../../Data/result.csv", arma::csv_ascii);
   // nn.propagate(vx);
   // mat ry = nn.output();
   // mat(ry.t()).save("../../Data/predict.csv", arma::csv_ascii);
