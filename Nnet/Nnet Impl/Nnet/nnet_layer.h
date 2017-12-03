@@ -9,11 +9,9 @@ namespace nnet
   class layer
   {
   public:
-    field<activation*> acts;
+    activation* act = NULL;
     optimizer* weight_opt = NULL;
     optimizer* bias_opt = NULL;
-
-    void init_malloc(const int &out_dim) { acts.set_size(out_dim); acts.fill(NULL); }
 
 
     void propagate(
@@ -23,6 +21,8 @@ namespace nnet
       mat *mul,
       mat *out)
     {
+      assert(act != NULL);
+
       int len = in.n_cols;
 
       // z = wa + b
@@ -31,10 +31,7 @@ namespace nnet
       // f(z)
       if (out->n_rows != mul->n_rows || out->n_cols != mul->n_cols)
         out->set_size(mul->n_rows, mul->n_cols);
-      int i = 0;
-      out->each_row(
-        [&i, this, mul](mat &r) { assert(this->acts(i) != NULL); r = this->acts(i)->propagate(mul->row(i)); ++i; }
-      );
+      *out = act->propagate(*mul);
     }
 
 
@@ -51,6 +48,7 @@ namespace nnet
       mat *bias
     )
     {
+      assert(act != NULL);
       assert(weight_opt != NULL);
       assert(bias_opt != NULL);
 
@@ -59,10 +57,7 @@ namespace nnet
       // f'(z)
       if (delta->n_rows != mul.n_rows || delta->n_cols != mul.n_cols)
         delta->set_size(mul.n_rows, mul.n_cols);
-      int i = 0;
-      delta->each_row(
-        [&i, this, &mul, &out_dloss](mat &r) { assert(this->acts(i) != NULL); r = this->acts(i)->back_propagate(mul.row(i)); ++i; }
-      );
+      *delta = act->back_propagate(mul);
 
       // delta = loss'(f(z)) .* f'(z)
       *delta = out_dloss % *delta;

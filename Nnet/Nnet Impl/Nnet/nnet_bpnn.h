@@ -18,7 +18,7 @@ namespace nnet
     field<mat> biases;
     field<mat> alphas;
     field<mat> lambdas;
-    field<loss*> loss_itf;
+    field<loss*> loss_itfs;
     int n_layers = 0;
 
 
@@ -39,9 +39,9 @@ namespace nnet
       alphas.set_size(n_layers);
       lambdas.set_size(n_layers);
       biases.set_size(n_layers);
-      loss_itf.set_size(ios_dim(ios_dim.n_elem - 1));
+      loss_itfs.set_size(ios_dim(ios_dim.n_elem - 1));
 
-      loss_itf.fill(NULL);
+      loss_itfs.fill(NULL);
       int i = 0;
       weights.for_each(
         [&i, &ios_dim](mat &m) { m.set_size(ios_dim(i + 1), ios_dim(i)); ++i; }
@@ -53,10 +53,6 @@ namespace nnet
       alphas.for_each(mat_malloc);
       i = 0;
       lambdas.for_each(mat_malloc);
-      i = 0;
-      layers.for_each(
-        [&i, &ios_dim](layer &l) { l.init_malloc(ios_dim(i + 1)); ++i; }
-      );
     }
 
 
@@ -69,7 +65,7 @@ namespace nnet
       const mat *vy = NULL,
       mat *vlosses = NULL)
     {
-      loss_itf.for_each(
+      loss_itfs.for_each(
         [](loss* &f) { assert(f != NULL); }
       );
 
@@ -100,7 +96,7 @@ namespace nnet
         if (tlosses != NULL)
         {
           tlosses->row(k - 1).each_col(
-            [&i, this, &ty](mat &r) { r = this->loss_itf(i)->avg_eval(this->ios(this->n_layers).row(i), ty.row(i)); ++i; }
+            [&i, this, &ty](mat &r) { r = this->loss_itfs(i)->avg_eval(this->ios(this->n_layers).row(i), ty.row(i)); ++i; }
           );
         }
 
@@ -109,7 +105,7 @@ namespace nnet
         if (dlosses(n_layers).n_rows != ty.n_rows || dlosses(n_layers).n_cols != ty.n_cols)
           dlosses(n_layers).set_size(ty.n_rows, ty.n_cols);
         dlosses(n_layers).each_row(
-          [&i, this, &ty](mat &r) { r = this->loss_itf(i)->diff(this->ios(this->n_layers).row(i), ty.row(i)); ++i; }
+          [&i, this, &ty](mat &r) { r = this->loss_itfs(i)->diff(this->ios(this->n_layers).row(i), ty.row(i)); ++i; }
         );
 
         // back propagate
@@ -121,7 +117,7 @@ namespace nnet
         {
           propagate(*vx);
           vlosses->row(k - 1).each_col(
-            [&i, this, vy](mat &r) { r = this->loss_itf(i)->avg_eval(this->ios(this->n_layers).row(i), vy->row(i)); ++i; }
+            [&i, this, vy](mat &r) { r = this->loss_itfs(i)->avg_eval(this->ios(this->n_layers).row(i), vy->row(i)); ++i; }
           );
         }
       }

@@ -17,9 +17,9 @@ int main(int argc, const char **argv)
   // y.print("y=");
 
   nnet::bpnn nn;
-  nn.init_malloc({ 23, 23, 20, 1 });
+  nn.init_malloc({ 23, 23, 20, 1 }); // 23, 23, 20, 1; 23, 23, 15, 1
 
-  nn.loss_itf.fill(new nnet::mse);
+  nn.loss_itfs.fill(new nnet::mse);
 
   nn.alphas(0).fill(0.001); // 0.001, 0.01
   nn.alphas(1).fill(0.002); // 0.002, 0.01
@@ -37,9 +37,9 @@ int main(int argc, const char **argv)
   nn.weights(1).fill(arma::fill::randn);
   nn.weights(2).fill(arma::fill::randn);
 
-  nn.layers(0).acts.fill(new nnet::tanh);
-  nn.layers(1).acts.fill(new nnet::sigmoid);
-  nn.layers(2).acts.fill(new nnet::leaky_relu(0.2));
+  nn.layers(0).act = new nnet::tanh;
+  nn.layers(1).act = new nnet::sigmoid; // sigmoid, tanh
+  nn.layers(2).act = new nnet::leaky_relu(0.2); // leaky_relu(0.2), identity
 
   nn.layers(0).weight_opt = new nnet::gradient_desc;
   nn.layers(1).weight_opt = new nnet::gradient_desc;
@@ -51,7 +51,7 @@ int main(int argc, const char **argv)
 
   mat tlosses;
   mat vlosses;
-  int n_iterations = 10000;
+  int n_iterations = 10000; // 10000, 3000
   nn.train(
     tx,
     ty,
