@@ -1,19 +1,35 @@
+"""
+batch functions
+"""
 import random as rnd
 
 
 class stochastic:
-    def b(self, data):
-        return data[rnd.choice(range(data.shape[0])), :]
+    @staticmethod
+    def b(x, y=None):
+        c = rnd.choice(range(x.shape[0]))
+        if y is None:
+            return x[c, :]
+        else:
+            return x[c, :], y[c, :]
 
 
 class mini_batch:
     def __init__(self, batch_size):
         self.k = batch_size
 
-    def b(self, data):
-        return data[rnd.sample(range(data.shape[0]), self.k), :]
+    def b(self, x, y=None):
+        c = rnd.sample(range(x.shape[0]), self.k)
+        if y is None:
+            return x[c, :]
+        else:
+            return x[c, :], y[c, :]
 
 
 class full:
-    def b(self, data):
-        return data
+    @staticmethod
+    def b(x, y=None):
+        if y is None:
+            return x
+        else:
+            return x, y
