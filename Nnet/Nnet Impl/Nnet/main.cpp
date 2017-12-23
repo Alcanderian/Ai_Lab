@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "nnet_bpnn.h"
-
+#include <armadillo>
 
 int main(int argc, const char **argv)
 {
@@ -8,7 +8,7 @@ int main(int argc, const char **argv)
   xy.load("../../../Fi Project/Data/bc/urain.csv");
   sx.load("../../../Fi Project/Data/bc/uest.csv");
   sx = sx.t();
-  double split_factor = 5.0 / 10.0;
+  double split_factor = 5.1 / 10.0;
   mat x = xy.cols(0, xy.n_cols - 2).t();
   mat y = xy.col(xy.n_cols - 1).t();
 

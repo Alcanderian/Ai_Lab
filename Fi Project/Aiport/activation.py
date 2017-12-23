@@ -11,7 +11,7 @@ class sigmoid:
 
     @staticmethod
     def d(x):
-        a = sigmoid.a(x)
+        a = gpu.logistic(x)
         return a * (1. - a)
 
 
@@ -22,8 +22,7 @@ class tanh:
 
     @staticmethod
     def d(x):
-        a = tanh.a(x)
-        return 1. - a ** 2
+        return 1. - gpu.tanh(x) ** 2
 
 
 class identity:
