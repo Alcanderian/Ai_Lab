@@ -1,0 +1,102 @@
+#include "stdafx.h"
+#include "nnet_bpnn.h"
+
+
+int main(int argc, const char **argv)
+{
+  mat xy;
+  xy.load("../../Data/urain.csv");
+  double split_factor = 11.0 / 12.0;
+  mat x = xy.cols(0, xy.n_cols - 2).t();
+  mat y = xy.col(xy.n_cols - 1).t();
+  mat tx = x.cols(0, split_factor * x.n_cols - 1);
+  mat vx = x.cols(split_factor * x.n_cols, x.n_cols - 1);
+  mat ty = y.cols(0, split_factor * y.n_cols - 1);
+  mat vy = y.cols(split_factor * y.n_cols, y.n_cols - 1);
+  // x.print("x=");
+  // y.print("y=");
+
+  nnet::bpnn nn;
+  nn.init_malloc({ 45, 45, 45, 1 });
+
+  nn.loss_itfs.fill(new nnet::mse);
+
+  nn.alphas(0).fill(0.001); // 0.001, 0.001
+  nn.alphas(1).fill(0.002); // 0.002, 0.002
+  nn.alphas(2).fill(0.003); // 0.003, 0.003
+
+  nn.lambdas(0).fill(0.02); // 0.02, 0.02
+  nn.lambdas(1).fill(0.01); // 0.01, 0.01
+  nn.lambdas(2).fill(0.01); // 0.01, 0.01
+
+  nn.biases(0).fill(0.1);
+  nn.biases(1).fill(0.1);
+  nn.biases(2).fill(0.1);
+
+  nn.weights(0).fill(arma::fill::randn);
+  nn.weights(1).fill(arma::fill::randn);
+  nn.weights(2).fill(arma::fill::randn);
+
+  nn.layers(0).act = new nnet::sigmoid; // sigmoid
+  nn.layers(1).act = new nnet::leaky_relu(0.1); // leaky_relu(0.1)
+  nn.layers(2).act = new nnet::leaky_relu(0.001); // leaky_relu(0.001), (0.1)
+
+  nn.layers(0).weight_opt = new nnet::gradient_desc;
+  nn.layers(1).weight_opt = new nnet::gradient_desc;
+  nn.layers(2).weight_opt = new nnet::gradient_desc;
+
+  nn.layers(0).bias_opt = new nnet::gradient_desc;
+  nn.layers(1).bias_opt = new nnet::gradient_desc;
+  nn.layers(2).bias_opt = new nnet::gradient_desc;
+
+  mat tlosses;
+  mat vlosses;
+  int n_iterations = 100; // 10000, 3000, 14970
+  nn.train(
+    x,
+    y,
+    n_iterations,
+    &tlosses,
+    &vx,
+    &vy,
+    &vlosses
+  );
+  // nn.ios.print("ios=");
+  // nn.muls.print("muls=");
+  // nn.deltas.print("deltas=");
+  // nn.weights.print("weights=");
+  // nn.biases.print("biases=");
+  tlosses.save("../../Data/tlosses.csv", arma::csv_ascii);
+  vlosses.save("../../Data/vlosses.csv", arma::csv_ascii);
+  xy.load("../../Data/test.csv");
+  mat sx = xy.cols(0, xy.n_cols - 2).t();
+  nn.propagate(sx);
+  arma::imat sy = zeros<arma::imat>(nn.output().n_rows, nn.output().n_cols);
+  int i = 0;
+  sy.for_each([&i, &nn](int64_t &e) { if (nn.output()(i) >= 0.0) { e = nn.output()(i); } ++i; });
+  arma::imat(sy.t()).save("../../Data/result.csv", arma::csv_ascii);
+
+  nnet::leaky_relu deal(0.0);
+  nnet::mse err;
+  mat ry, ey;
+
+  nn.propagate(tx);
+  deal.propagate(nn.output(), &ry);
+  ry = round(ry);
+  err.avg_eval(ry, ty, &ey);
+  ey.print("trainng error = ");
+  cor(ry, ty).print("trainng correlation =");
+  mat(ry.t()).save("../../Data/predict.csv", arma::csv_ascii);
+  mat(ty.t()).save("../../Data/actual.csv", arma::csv_ascii);
+
+  nn.propagate(vx);
+  deal.propagate(nn.output(), &ry);
+  ry = round(ry);
+  err.avg_eval(ry, vy, &ey);
+  ey.print("validation error = ");
+  cor(ry, vy).print("validation correlation =");
+  mat(ry.t()).save("../../Data/predict.csv", arma::csv_ascii);
+  mat(vy.t()).save("../../Data/actual.csv", arma::csv_ascii);
+
+  return 0;
+}
