@@ -20,7 +20,7 @@ namespace nnet
     public:
       // 1 / (1 + e^z)
       void propagate(const mat &z, mat *y) { *y =  1.0 / (1.0 + exp(-z)); }
-      // z / (1 - z)
+      // z * (1 - z)
       void back_propagate(const mat &z, mat *y) { *y = z % (1.0 - z); }
     };
 

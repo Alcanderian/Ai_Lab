@@ -4,11 +4,22 @@
 
 int main(int argc, const char **argv)
 {
-  mat xy;
-  xy.load("../../Data/train.csv");
-  double split_factor = 11.0 / 12.0;
+  mat xy, sx;
+  xy.load("../../../Fi Project/Data/bc/urain.csv");
+  sx.load("../../../Fi Project/Data/bc/uest.csv");
+  sx = sx.t();
+  double split_factor = 5.0 / 10.0;
   mat x = xy.cols(0, xy.n_cols - 2).t();
   mat y = xy.col(xy.n_cols - 1).t();
+
+  int n_train_samples = x.n_cols;
+  mat xx = join_horiz(x, sx);
+  for (int i = 0; i < xx.n_rows; ++i) {
+    xx.row(i) = (xx.row(i) - min(xx.row(i))) / (max(xx.row(i)) - min(xx.row(i)));
+  }
+  x = xx.cols(0, n_train_samples - 1);
+  sx = xx.cols(n_train_samples, xx.n_cols - 1);
+  
   mat tx = x.cols(0, split_factor * x.n_cols - 1);
   mat vx = x.cols(split_factor * x.n_cols, x.n_cols - 1);
   mat ty = y.cols(0, split_factor * y.n_cols - 1);
@@ -17,69 +28,63 @@ int main(int argc, const char **argv)
   // y.print("y=");
 
   nnet::bpnn nn;
-  nn.init_malloc({ 23, 23, 20, 1 }); // 23, 23, 20, 1; 23, 23, 15, 1
+  nn.init_malloc({ 16, 16, 16, 1 });
 
-  nn.loss_itfs.fill(new nnet::mse);
+  nn.loss_itfs.fill(new nnet::xent);
 
-  nn.alphas(0).fill(0.001); // 0.001, 0.01
-  nn.alphas(1).fill(0.002); // 0.002, 0.01
-  nn.alphas(2).fill(0.005); // 0.005, 0.01
+  nn.alphas(0).fill(0.01);
+  nn.alphas(1).fill(0.01);
+  nn.alphas(2).fill(0.01);
 
-  nn.lambdas(0).fill(0.1); // 0.1, 0.0
-  nn.lambdas(1).fill(0.1); // 0.1, 0.0
-  nn.lambdas(2).fill(0.1); // 0.1, 0.0
+  nn.lambdas(0).fill(0.0);
+  nn.lambdas(1).fill(0.0);
+  nn.lambdas(2).fill(0.0);
 
-  nn.biases(0).fill(0.1);
-  nn.biases(1).fill(0.1);
-  nn.biases(2).fill(0.1);
+  nn.biases(0).fill(arma::fill::randn);
+  nn.biases(1).fill(arma::fill::randn);
+  nn.biases(2).fill(arma::fill::randn);
 
   nn.weights(0).fill(arma::fill::randn);
   nn.weights(1).fill(arma::fill::randn);
   nn.weights(2).fill(arma::fill::randn);
 
-  nn.layers(0).act = new nnet::tanh;
-  nn.layers(1).act = new nnet::sigmoid; // sigmoid, tanh
-  nn.layers(2).act = new nnet::leaky_relu(0.2); // leaky_relu(0.2), identity
+  nn.layers(0).act = new nnet::identity;
+  nn.layers(1).act = new nnet::sigmoid;
+  nn.layers(2).act = new nnet::sigmoid;
 
-  nn.layers(0).weight_opt = new nnet::gradient_desc;
-  nn.layers(1).weight_opt = new nnet::gradient_desc;
-  nn.layers(2).weight_opt = new nnet::gradient_desc;
+  nn.layers(0).weight_opt = new nnet::adam;
+  nn.layers(1).weight_opt = new nnet::adam;
+  nn.layers(2).weight_opt = new nnet::adam;
 
-  nn.layers(0).bias_opt = new nnet::gradient_desc;
-  nn.layers(1).bias_opt = new nnet::gradient_desc;
-  nn.layers(2).bias_opt = new nnet::gradient_desc;
+  nn.layers(0).bias_opt = new nnet::adam;
+  nn.layers(1).bias_opt = new nnet::adam;
+  nn.layers(2).bias_opt = new nnet::adam;
 
   mat tlosses;
   mat vlosses;
-  int n_iterations = 15933; // 10000, 3000, 15933
+  int n_iterations = 10;
   nn.train(
-    x,
-    y,
+    tx,
+    ty,
     n_iterations,
-    &tlosses // ,
-    // &vx,
-    // &vy,
-    // &vlosses
+    &tlosses,
+    &vx,
+    &vy,
+    &vlosses
   );
-  // nn.ios.print("ios=");
-  // nn.muls.print("muls=");
-  // nn.deltas.print("deltas=");
-  // nn.weights.print("weights=");
-  // nn.biases.print("biases=");
-  tlosses.save("../../Data/tlosses.csv", arma::csv_ascii);
-  // vlosses.save("../../Data/vlosses.csv", arma::csv_ascii);
-  xy.load("../../Data/test.csv");
-  mat sx = xy.cols(0, xy.n_cols - 2).t();
-  nn.propagate(sx);
-  arma::imat sy = zeros<arma::imat>(nn.output().n_rows, nn.output().n_cols);
-  int i = 0;
-  sy.for_each([&i, &nn](int64_t &e) { if (nn.output()(i) >= 0.0) { e = nn.output()(i); } ++i; });
-  arma::imat(sy.t()).save("../../Data/result.csv", arma::csv_ascii);
-  // nn.propagate(vx);
-  // mat ry = nn.output();
-  // mat(ry.t()).save("../../Data/predict.csv", arma::csv_ascii);
-  // mat(vy.t()).save("../../Data/actual.csv", arma::csv_ascii);
-  // cor(ry, vy).print("corr =");
+  nn.propagate(vx);
+  nnet::loss *f1 = new nnet::nf1;
+  mat eval;
+  f1->avg_eval(nn.output(), vy, &eval);
+  (-eval).print("f1 =");
 
+  nn.propagate(sx);
+  mat syp = nn.output();
+  syp.elem(find(syp < 0.5)).fill(0.0);
+  syp.elem(find(syp >= 0.5)).fill(1.0);
+  arma::imat sy(syp.n_rows, syp.n_cols);
+  int i = 0;
+  sy.for_each([&i, &syp](int64_t &n) { n = syp(i++); });
+  arma::imat(sy.t()).save("../../../Fi Project/Data/bc/uesult.csv", arma::csv_ascii);
   return 0;
 }

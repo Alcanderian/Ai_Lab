@@ -32,7 +32,8 @@ namespace nnet
     adam(
       const double &beta = 0.9, 
       const double &gamma = 0.999, 
-      const double &eps = 1e-8) :
+      const double &eps = 1e-8
+    ) :
       beta(beta), gamma(gamma), eps(eps)
     { }
 

@@ -5,7 +5,7 @@ VisualStudioVersion = 15.0.27004.2009
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Lg Rgrs", "Lg Rgrs\Lg Rgrs.vcxproj", "{6F22F5A7-FB6E-4046-AE1A-CA05D795978C}"
 EndProject
-Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "Lr py", "Lr py\Lr py.pyproj", "{9D178B64-CC43-441C-AA7A-4BE41A74551A}"
+Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "Lr Py", "Lr Py\Lr Py.pyproj", "{9D178B64-CC43-441C-AA7A-4BE41A74551A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

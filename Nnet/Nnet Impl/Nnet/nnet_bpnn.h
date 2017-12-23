@@ -92,17 +92,8 @@ namespace nnet
         // propagate
         propagate(tx);
 
-        // k-th iteration's train avg-loss
-        int i = 0;
-        if (tlosses != NULL)
-        {
-          tlosses->row(k - 1).each_col(
-            [&i, this, &ty](mat &r) { this->loss_itfs(i)->avg_eval(this->ios(this->n_layers).row(i), ty.row(i), &r); ++i; }
-          );
-        }
-
         // dloss(l + 1)
-        i = 0;
+        int i = 0;
         if (dlosses(n_layers).n_rows != ty.n_rows || dlosses(n_layers).n_cols != ty.n_cols)
           dlosses(n_layers).set_size(ty.n_rows, ty.n_cols);
         dlosses(n_layers).each_row(
@@ -111,6 +102,16 @@ namespace nnet
 
         // back propagate
         back_propagate(k);
+
+        // k-th iteration's train avg-loss
+        i = 0;
+        if (tlosses != NULL)
+        {
+          propagate(tx);
+          tlosses->row(k - 1).each_col(
+            [&i, this, &ty](mat &r) { this->loss_itfs(i)->avg_eval(this->ios(this->n_layers).row(i), ty.row(i), &r); ++i; }
+          );
+        }
 
         // k-th iteration's validation avg-loss
         i = 0;

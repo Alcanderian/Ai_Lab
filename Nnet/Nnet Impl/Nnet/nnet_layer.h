@@ -18,7 +18,8 @@ namespace nnet
       const mat &in,
       const mat &weight,
       const mat &bias,
-      mat *out)
+      mat *out
+    )
     {
       assert(act != NULL);
 
@@ -54,7 +55,7 @@ namespace nnet
       act->back_propagate(out, delta);
 
       // delta = loss'(f(z)) .* f'(z)
-      *delta = out_dloss % *delta;
+      *delta %= out_dloss;
 
       // prev_dloss = w.t() * delta
       *in_dloss = weight->t() * *delta;
@@ -62,12 +63,12 @@ namespace nnet
       // w =  w - alpha .* opt((delta * in.t()) / len + lambda .* w)
       *weight_gradient = (*delta * in.t()) / len + repmat(lambda, 1, in_dim) % *weight;
       weight_opt->optimize(k, weight_gradient);
-      *weight = *weight - repmat(alpha, 1, in_dim) % *weight_gradient;
+      *weight -= repmat(alpha, 1, in_dim) % *weight_gradient;
 
       // b = b - alpha .* opt(mean_of_rows(delta))
       *bias_gradient = mean(*delta, 1);
       bias_opt->optimize(k, bias_gradient);
-      *bias = *bias - alpha % *bias_gradient;
+      *bias -= alpha % *bias_gradient;
     }
   };
 }
