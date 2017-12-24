@@ -1,28 +1,33 @@
 """
 activation functions
 """
-import gnumpy as gpu
+from config import mk, cpu, gpu
 
 
 class sigmoid:
     @staticmethod
     def a(x):
-        return gpu.logistic(x)
+        if mk is gpu:
+            return mk.logistic(x)
+        elif mk is cpu:
+            return 1. / (1. + mk.exp(-x))
+        else:
+            raise TypeError('only cpu and gpu are supported')
 
     @staticmethod
     def d(x):
-        a = gpu.logistic(x)
+        a = sigmoid.a(x)
         return a * (1. - a)
 
 
 class tanh:
     @staticmethod
     def a(x):
-        return gpu.tanh(x)
+        return mk.tanh(x)
 
     @staticmethod
     def d(x):
-        return 1. - gpu.tanh(x) ** 2
+        return 1. - mk.tanh(x) ** 2
 
 
 class identity:
@@ -32,7 +37,7 @@ class identity:
 
     @staticmethod
     def d(x):
-        return gpu.ones(x.shape)
+        return mk.ones(x.shape)
 
 
 class leaky_relu:
@@ -46,6 +51,6 @@ class leaky_relu:
         return r
 
     def d(self, x):
-        r = gpu.ones(x.shape)
+        r = mk.ones(x.shape)
         r -= (x < 0) * (1. - self.alpha)
         return r

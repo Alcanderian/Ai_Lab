@@ -1,7 +1,7 @@
 """
 distance functions
 """
-import gnumpy as gpu
+from config import mk
 
 
 class norm_distance:
@@ -11,7 +11,7 @@ class norm_distance:
 
     def d(self, x, y):
         if self.p == 1:
-            return gpu.sum(gpu.abs(x - y), axis=0)
+            return mk.sum(mk.abs(x - y), axis=0)
         if self.p == 2:
-            return gpu.sqrt(gpu.sum((x - y) ** 2, axis=0))
-        return gpu.sum(gpu.abs(x - y) ** self.p, axis=0) ** (1. / self.p)
+            return mk.sqrt(mk.sum((x - y) ** 2, axis=0))
+        return mk.sum(mk.abs(x - y) ** self.p, axis=0) ** (1. / self.p)

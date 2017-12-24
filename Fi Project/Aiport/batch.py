@@ -7,11 +7,11 @@ import random as rnd
 class stochastic:
     @staticmethod
     def b(x, y=None):
-        c = rnd.choice(range(x.shape[0]))
+        c = rnd.choice(range(x.shape[1]))
         if y is None:
-            return x[c, :]
+            return x[:, c]
         else:
-            return x[c, :], y[c, :]
+            return x[:, c], y[:, c]
 
 
 class mini_batch:
@@ -19,11 +19,11 @@ class mini_batch:
         self.k = batch_size
 
     def b(self, x, y=None):
-        c = rnd.sample(range(x.shape[0]), self.k)
+        c = rnd.sample(range(x.shape[1]), self.k)
         if y is None:
-            return x[c, :]
+            return x[:, c]
         else:
-            return x[c, :], y[c, :]
+            return x[:, c], y[:, c]
 
 
 class full:
